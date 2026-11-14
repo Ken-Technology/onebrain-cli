@@ -1,0 +1,19 @@
+{
+  "name": "onebrain-cli",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "packageManager": "pnpm@11.7.0",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "typecheck": "pnpm -r typecheck",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@types/node": "^22.18.0",
+    "typescript": "7.0.2",
+    "vitest": "5.1.0"
+  }
+}

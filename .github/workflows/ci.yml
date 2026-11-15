@@ -1,29 +1,58 @@
 name: CI
 
+# GitHub-hosted on purpose: this repo is public, so hosted minutes are free,
+# and a fork PR must never run its code on Kenso's self-hosted pools. The job
+# runs the repo's own scripts (typecheck, test, the SDK generator) and the
+# README's --help smoke. There is no lint or build script: Node runs the
+# TypeScript sources directly.
+
 on:
   pull_request:
   push:
     branches: [main]
 
+# A new push to a PR cancels its running check; a push to main waits instead,
+# so every main commit gets a result.
 concurrency:
-  group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
   contents: read
 
 jobs:
-  check:
-    name: Types and tests
+  ci:
+    # Named CI like the other Kenso repos' required check.
+    name: CI
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # The tests run PR code: keep the token out of .git/config.
+          persist-credentials: false
+      # Before setup-node, whose pnpm cache asks pnpm for the store path.
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 22
-      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm typecheck
-      - run: pnpm test
-      - run: node apps/cli/src/index.ts --help
+          cache: pnpm
+      - name: Install
+        id: install
+        run: pnpm install --frozen-lockfile --prefer-offline
+      # Each check runs once the install passed, even after another check
+      # failed, so one push shows every failure.
+      - name: Typecheck
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: pnpm typecheck
+      - name: Test
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: pnpm test
+      - name: SDK schema matches openapi.json
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: |
+          pnpm --filter @onebrain/sdk generate
+          git diff --exit-code -- packages/sdk/src/schema.ts
+      - name: CLI starts
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: node apps/cli/src/index.ts --help

@@ -43,7 +43,7 @@ function context(input: {
     abortSignal: new AbortController().signal,
     memory: { slot: 'onebrain', scope: { key: 'memscope1_x', namespace: 'ns', value: 'team' } },
     messages: input.messages,
-    operationId: input.operationId ?? `op-${Math.random()}`,
+    operationId: input.operationId ?? `op-${crypto.randomUUID()}`,
     turn,
     session: session(input.sessionId, turn?.sequence ?? 0, input.principalId),
   } as never;

@@ -47,7 +47,8 @@ async function quiet<T>(
 
 let keys = 0;
 /** A key no other case uses, so the isolate-wide skills cache never mixes cases. */
-const freshKey = (prefix = 'ob_k') => `${prefix}${++keys}x${Math.random().toString(36).slice(2)}`;
+const freshKey = (prefix = 'ob_k') =>
+  `${prefix}${++keys}x${crypto.randomUUID().replaceAll('-', '')}`;
 
 const renewal: FakeSkill = {
   name: 'renewal-check',

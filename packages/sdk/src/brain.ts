@@ -85,8 +85,30 @@ function env(name: string): string | undefined {
   }
 }
 
-/** A path as the API keeps it: no spaces or slashes at either end. */
-const trimPath = (path: string) => path.replace(/^[\s/]+|[\s/]+$/g, '');
+/** A space or a slash: what trimPath takes off a path's ends. */
+const isEdge = (char: string) => char === '/' || /\s/.test(char);
+
+/**
+ * A path as the API keeps it: no spaces or slashes at either end. A loop, not a regex: a regex
+ * anchored at the end takes quadratic time on a long run of slashes, and paths come from agents.
+ */
+function trimPath(path: string): string {
+  let start = 0;
+  let end = path.length;
+  while (start < end && isEdge(path[start] as string)) start += 1;
+  while (end > start && isEdge(path[end - 1] as string)) end -= 1;
+  return path.slice(start, end);
+}
+
+/**
+ * The URL without trailing slashes. A loop, not a regex: `/\/+$/` takes quadratic time on a long
+ * run of slashes.
+ */
+function withoutTrailingSlashes(url: string): string {
+  let end = url.length;
+  while (end > 0 && url[end - 1] === '/') end -= 1;
+  return url.slice(0, end);
+}
 
 /**
  * A One Brain client: the workspace's files, skills and memories, and session capture. It runs
@@ -97,7 +119,7 @@ const trimPath = (path: string) => path.replace(/^[\s/]+|[\s/]+$/g, '');
  * signed in, for every other route.
  */
 export function createOneBrain(options: OneBrainOptions = {}) {
-  const url = (options.url ?? env('ONEBRAIN_URL') ?? DEFAULT_URL).replace(/\/+$/, '');
+  const url = withoutTrailingSlashes(options.url ?? env('ONEBRAIN_URL') ?? DEFAULT_URL);
   const apiKey = options.apiKey ?? env('ONEBRAIN_API_KEY');
   const fetchWith = options.fetch;
   const api = createClient<paths>({

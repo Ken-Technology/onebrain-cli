@@ -272,6 +272,25 @@ describe('createOneBrain: the six tools and skills', () => {
     expect(error).toMatchObject({ code: 'not_found', status: 404 });
   });
 
+  it('trims a long run of slashes from a URL or a path in linear time', async () => {
+    // A long run of slashes with something after it: the end-anchored regexes this replaced took
+    // about 12 s on each. A path can come from an agent's tool call.
+    const slashes = '/'.repeat(100_000);
+    const started = performance.now();
+    // No routes: every request answers 404.
+    const { brain, sent } = brainWith({}, { url: `${URL_}${slashes}x${slashes}` });
+    await brain.search({ query: 'q' }).catch(() => null);
+    expect(new URL(sent[0]?.url ?? '').pathname).toBe(`${slashes}x/v1/workspaces/acme/search`);
+    const { brain: other, sent: asked } = brainWith({});
+    const error = await other.read({ path: `/a${slashes}x ` }).catch((caught: unknown) => caught);
+    expect(error).toMatchObject({ code: 'not_found' });
+    expect(asked.map((one) => new URL(one.url).pathname)).toEqual([
+      '/v1/workspaces/acme/files',
+      '/v1/workspaces/acme/skills/x',
+    ]);
+    expect(performance.now() - started).toBeLessThan(1000);
+  });
+
   it('list answers the tree at a path, the root by default, or the skills', async () => {
     const tree = { node: null, children: [], nextCursor: null };
     const { brain, sent } = brainWith({

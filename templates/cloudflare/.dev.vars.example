@@ -1,0 +1,6 @@
+# Your One Brain API. Keep this unless you run One Brain yourself.
+ONEBRAIN_URL=https://api.useonebrain.com
+# A One Brain agent key (ob_...): in the One Brain app under Agents, or `onebrain admin keys create <agent>`.
+ONEBRAIN_API_KEY=ob_replace_me
+# Anyone with this token can chat with the agent. Make one with `openssl rand -hex 32`.
+AGENT_TOKEN=replace_me

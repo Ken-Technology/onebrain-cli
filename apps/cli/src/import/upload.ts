@@ -100,7 +100,10 @@ function reportFailure(io: Io, label: string, error: ApiError): void {
   io.stderr(`failed ${label}: ${error.code}: ${error.message}\n`);
 }
 
-/** PUT files on base version 0. A conflict means it is already there. */
+/**
+ * PUT files on base version 0. A conflict that names the file's current version means it is
+ * already there; any other conflict (its folder moved during the write) failed.
+ */
 export async function uploadFiles(
   client: CliClient,
   io: Io,
@@ -129,8 +132,9 @@ export async function uploadFiles(
         else counts.created++;
       } catch (error) {
         if (!(error instanceof ApiError)) throw error;
-        if (error.code === 'conflict') counts.existing++;
-        else {
+        if (error.code === 'conflict' && typeof error.extra.currentVersion === 'number') {
+          counts.existing++;
+        } else {
           counts.failed++;
           reportFailure(io, file.target, error);
         }

@@ -1,10 +1,13 @@
 import { homedir } from 'node:os';
-import { createOneBrainClient, type OneBrainClient } from '@onebrain/sdk';
+import { createOneBrainClient, type OneBrainClient } from '@useonebrain/sdk';
 import { readConfig } from './config.ts';
 import {
   type CredentialStore,
   createCredentialStore,
-  refreshLogin,
+  KeychainRefused,
+  RefreshLockBusy,
+  type RefreshLockOptions,
+  refreshShared,
   type StoredLogin,
 } from './credentials.ts';
 
@@ -82,25 +85,49 @@ export function apiUrl(env: Record<string, string | undefined>, home: string): s
   return url.replace(/\/+$/, '');
 }
 
+/** refreshShared, with its failures as the CLI says them. Nobody signed in is "expired". */
+async function renewLogin(
+  store: CredentialStore,
+  url: string,
+  stale: string,
+  fetchFn: typeof fetch,
+  lock: RefreshLockOptions,
+): Promise<StoredLogin> {
+  let next: StoredLogin | null;
+  try {
+    next = await refreshShared(store, url, stale, fetchFn, lock);
+  } catch (error) {
+    if (error instanceof RefreshLockBusy || error instanceof KeychainRefused) {
+      throw new CliError(error.message);
+    }
+    if (error instanceof Error && error.name === 'TimeoutError') {
+      throw new CliError('The sign-in service did not answer in 20 seconds. Try again.');
+    }
+    throw error;
+  }
+  if (!next) throw new CliError('Your sign-in expired. Run onebrain login.');
+  return next;
+}
+
 /**
  * A fetch that, on a 401, refreshes the stored login once and repeats the request with the new
  * token. Requests running at the same time share one refresh. If the new token is refused too,
- * nothing is refreshed again: every later 401 comes back as it is.
+ * nothing is refreshed again: every later 401 comes back as it is. The refresh runs under the
+ * lock shared with the Mac app, and takes a newer stored login instead of refreshing when another
+ * process already did.
  */
 export function refreshingFetch(
   base: typeof fetch,
   store: CredentialStore,
   initial: StoredLogin,
+  lock: RefreshLockOptions,
 ): typeof fetch {
   let login = initial;
   let refreshing: Promise<void> | null = null;
   let refused = false;
 
   const renew = async (): Promise<void> => {
-    const next = await refreshLogin(login, base);
-    if (!next) throw new CliError('Your sign-in expired. Run onebrain login.');
-    await store.save(next);
-    login = next;
+    login = await renewLogin(store, login.url, login.accessToken, base, lock);
   };
   const refresh = (stale: string): Promise<void> => {
     if (login.accessToken !== stale) return Promise.resolve(); // another request already did it
@@ -124,6 +151,21 @@ export function refreshingFetch(
     if (second.status === 401) refused = true;
     return second;
   }) as typeof fetch;
+}
+
+/**
+ * The login the store holds for this server, or null. A Mac keychain that would not say is not
+ * "Not signed in": the CLI ends with 1 and the store's own sentence.
+ */
+export async function storedLogin(
+  store: CredentialStore,
+  url: string,
+): Promise<StoredLogin | null> {
+  try {
+    return await store.load(url);
+  } catch (error) {
+    throw error instanceof KeychainRefused ? new CliError(error.message) : error;
+  }
 }
 
 export type GetClientOptions = {
@@ -160,15 +202,12 @@ export async function getClient(options: GetClientOptions = {}): Promise<CliClie
   let sendWith = options.fetch;
   if (!token) {
     const store = createCredentialStore({ home, env });
-    let login = await store.load(url);
+    let login = await storedLogin(store, url);
     if (login && new Date(login.expiresAt).getTime() - Date.now() < 60_000) {
-      const refreshed = await refreshLogin(login, fetchFn);
-      if (!refreshed) throw new CliError('Your sign-in expired. Run onebrain login.');
-      await store.save(refreshed);
-      login = refreshed;
+      login = await renewLogin(store, url, login.accessToken, fetchFn, { home });
     }
     token = login?.accessToken;
-    if (login) sendWith = refreshingFetch(fetchFn, store, login);
+    if (login) sendWith = refreshingFetch(fetchFn, store, login, { home });
   }
   if (!token) {
     throw new CliError(

@@ -1,3 +1,4 @@
+import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -198,6 +199,95 @@ describe('init hook', () => {
     expect(await handleHook(['claude-code', '--private'], testIo({ stdin: input }).io, boom)).toBe(
       0,
     );
+  });
+
+  const DAY = 24 * 3600_000;
+  /** desktop.json as the Mac app writes it: the tools it captures, and when it was last seen. */
+  const marker = (tools: unknown, ageMs = 0, pid?: number) =>
+    JSON.stringify({
+      sessions: true,
+      tools,
+      seenAt: new Date(Date.now() - ageMs).toISOString(),
+      ...(pid === undefined ? {} : { pid }),
+    });
+  /** How many captures the hook started with this content in desktop.json (null: no file). */
+  const started = async (name: string, content: string | null) => {
+    const input = JSON.stringify({ session_id: 's1', transcript_path: '/t/s1.jsonl' });
+    const t = testIo({ stdin: input });
+    if (content !== null) {
+      mkdirSync(join(t.home, '.config/onebrain'), { recursive: true });
+      writeFileSync(join(t.home, '.config/onebrain/desktop.json'), content);
+    }
+    const captures: string[][] = [];
+    expect(await handleHook([name, '--private'], t.io, (args) => captures.push(args))).toBe(0);
+    return captures.length;
+  };
+
+  it('steps aside while the Mac app captures sessions, and only then', async () => {
+    const all = marker(['claude-code', 'codex', 'cursor']);
+    expect(await started('claude-code', all)).toBe(0);
+    expect(await started('codex', all)).toBe(0);
+    expect(await started('cursor', all)).toBe(0);
+    expect(await started('gemini', all)).toBe(1); // the app does not watch Gemini CLI
+    expect(await started('gemini', marker(['gemini']))).toBe(1);
+    expect(await started('claude-code', null)).toBe(1);
+    expect(await started('claude-code', all.replace('true', 'false'))).toBe(1);
+    expect(await started('claude-code', all.replace('true', '"true"'))).toBe(1);
+    expect(await started('claude-code', 'null')).toBe(1);
+    expect(await started('claude-code', 'not json')).toBe(1);
+  });
+
+  it('steps aside only for the tools the app lists', async () => {
+    // Cursor is switched off in the app, or the app did not find it: the hook captures it.
+    const two = marker(['claude-code', 'codex']);
+    expect(await started('claude-code', two)).toBe(0);
+    expect(await started('codex', two)).toBe(0);
+    expect(await started('cursor', two)).toBe(1);
+    expect(await started('claude-code', marker([]))).toBe(1);
+    expect(await started('claude-code', marker('claude-code'))).toBe(0); // no list: all three
+    expect(await started('cursor', marker(undefined))).toBe(0);
+  });
+
+  it('steps aside only while the app was seen in the last 7 days', async () => {
+    const mine = ['claude-code'];
+    expect(await started('claude-code', marker(mine, 6 * DAY))).toBe(0);
+    expect(await started('claude-code', marker(mine, 8 * DAY))).toBe(1); // in the Trash, or crashed
+    expect(await started('claude-code', marker(mine, -8 * DAY))).toBe(1); // a time that cannot be
+    expect(await started('claude-code', '{"sessions":true,"tools":["claude-code"]}')).toBe(1);
+    expect(
+      await started('claude-code', '{"sessions":true,"tools":["claude-code"],"seenAt":"lately"}'),
+    ).toBe(1);
+    // The marker of an app from before the list: all three tools, never seen, so stale at once.
+    expect(await started('claude-code', '{"sessions":true}')).toBe(1);
+    expect(await started('codex', '{ "sessions": true }')).toBe(1);
+    expect(await started('cursor', '{"sessions":true}')).toBe(1);
+  });
+
+  it('steps aside only while the app that wrote the marker runs', async () => {
+    const mine = ['claude-code'];
+    expect(await started('claude-code', marker(mine, 0, process.pid))).toBe(0);
+    // The app crashed or was forced to quit: its marker stayed, its process is gone.
+    const gone = spawnSync(process.execPath, ['-e', '']).pid;
+    expect(await started('claude-code', marker(mine, 0, gone))).toBe(1);
+    expect(await started('claude-code', marker(mine, 0, -1))).toBe(1);
+    // A marker from an app before the process id: the 7-day rule alone.
+    expect(await started('claude-code', marker(mine))).toBe(0);
+  });
+
+  it('does not read stdin when it steps aside', async () => {
+    const t = testIo();
+    mkdirSync(join(t.home, '.config/onebrain'), { recursive: true });
+    writeFileSync(join(t.home, '.config/onebrain/desktop.json'), marker(['claude-code']));
+    let reads = 0;
+    const io = {
+      ...t.io,
+      readStdin: async () => {
+        reads++;
+        return null;
+      },
+    };
+    expect(await handleHook(['claude-code', '--private'], io, () => {})).toBe(0);
+    expect(reads).toBe(0);
   });
 });
 

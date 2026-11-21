@@ -1,0 +1,59 @@
+{
+  "name": "@useonebrain/cloudflare",
+  "version": "0.1.0",
+  "description": "One Brain for Cloudflare Agents: your team's skills, recall and memory in a few lines, and each finished turn captured for the learning loop.",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "homepage": "https://useonebrain.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ken-Technology/onebrain-cli.git",
+    "directory": "packages/integrations/cloudflare"
+  },
+  "keywords": [
+    "onebrain",
+    "cloudflare",
+    "cloudflare-agents",
+    "agents",
+    "skills",
+    "memory",
+    "mcp"
+  ],
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true,
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    },
+    "types": "./dist/index.d.ts"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "prepack": "pnpm run build",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p test/types"
+  },
+  "peerDependencies": {
+    "agents": ">=0.32.0 <0.35.0"
+  },
+  "dependencies": {
+    "@useonebrain/sdk": "workspace:^"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "5.20261119.1",
+    "agents": "0.33.0",
+    "esbuild": "0.28.2",
+    "typescript": "5.9.3",
+    "workerd": "1.20261119.1",
+    "zod": "4.6.7"
+  }
+}

@@ -259,6 +259,54 @@ describe('import <path>', () => {
     expect(t.stderr()).toContain('skipped My Notes.md: not a valid One Brain name');
   });
 
+  it("counts a conflict without the file's version as failed, not already there", async () => {
+    const moved = 'That folder was moved or deleted while you were saving. Try again.';
+    const { api } = fakeApi({
+      'GET /v1/me': () => ({ body: person }),
+      [`GET ${W}/tree`]: () => ({
+        body: {
+          node: {
+            id: 'f1',
+            kind: 'folder',
+            name: 'Docs',
+            path: 'Docs',
+            visibility: 'workspace',
+            access: 'restricted',
+            writePolicy: 'inherit',
+            currentVersion: null,
+            updatedAt: at,
+          },
+          children: [],
+        },
+      }),
+      [`PUT ${W}/files`]: () => ({
+        status: 409,
+        body: { error: { code: 'conflict', message: moved } },
+      }),
+    });
+    const dir = mkdtempSync(join(tmpdir(), 'onebrain-import-'));
+    writeFileSync(join(dir, 'a.md'), 'a');
+    const t = testIo({ api });
+    expect(await importCommand.run([dir, '--into', 'Docs'], t.io)).toBe(1);
+    expect(t.stdout()).toContain(
+      'files: 0 created, 0 proposed, 0 already there, 0 skipped, 1 failed',
+    );
+    expect(t.stderr()).toContain(`failed Docs/a.md: conflict: ${moved}`);
+  });
+
+  it("counts a conflict that names the file's version as already there", async () => {
+    const { api } = brain(person, 'restricted', ['Docs']);
+    const dir = mkdtempSync(join(tmpdir(), 'onebrain-import-'));
+    writeFileSync(join(dir, 'a.md'), 'a');
+    expect(await importCommand.run([dir, '--into', 'Docs'], testIo({ api }).io)).toBe(0);
+    const second = testIo({ api });
+    expect(await importCommand.run([dir, '--into', 'Docs'], second.io)).toBe(0);
+    expect(second.stdout()).toContain(
+      'files: 0 created, 0 proposed, 1 already there, 0 skipped, 0 failed',
+    );
+    expect(second.stderr()).not.toMatch(/^failed/m);
+  });
+
   it('uses an existing folder as it is', async () => {
     const { api, calls } = brain();
     await importCommand.run(kenBrainArgs(), testIo({ api }).io);

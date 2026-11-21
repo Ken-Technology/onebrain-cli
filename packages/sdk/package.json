@@ -1,14 +1,48 @@
 {
-  "name": "@onebrain/sdk",
-  "version": "0.0.0",
-  "private": true,
+  "name": "@useonebrain/sdk",
+  "version": "0.1.0",
+  "description": "The One Brain client: search, read, remember and capture from any agent. Runs in Node, Vercel and Cloudflare Workers.",
   "license": "MIT",
   "type": "module",
+  "sideEffects": false,
+  "homepage": "https://useonebrain.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ken-Technology/onebrain-cli.git",
+    "directory": "packages/sdk"
+  },
+  "keywords": [
+    "onebrain",
+    "ai",
+    "agents",
+    "memory",
+    "knowledge-base",
+    "skills"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
   "exports": {
     ".": "./src/index.ts"
   },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true,
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    },
+    "types": "./dist/index.d.ts"
+  },
   "scripts": {
     "generate": "openapi-typescript openapi.json -o src/schema.ts",
+    "build": "node scripts/build.mjs",
+    "prepack": "pnpm run build",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

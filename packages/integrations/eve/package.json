@@ -1,0 +1,59 @@
+{
+  "name": "@useonebrain/eve",
+  "version": "0.1.0",
+  "description": "One Brain for eve agents: a memory provider that recalls from and captures to your team's brain, its tools, an MCP connection and the workspace's skills.",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "homepage": "https://useonebrain.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ken-Technology/onebrain-cli.git",
+    "directory": "packages/integrations/eve"
+  },
+  "keywords": [
+    "onebrain",
+    "eve",
+    "memory",
+    "agents",
+    "skills",
+    "mcp"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true,
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    },
+    "types": "./dist/index.d.ts"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "prepack": "pnpm run build",
+    "registry": "node scripts/registry.mjs",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "eve": ">=1.0.0 <2"
+  },
+  "dependencies": {
+    "@useonebrain/sdk": "workspace:^",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "eve": "1.2.0",
+    "typescript": "5.9.3"
+  }
+}

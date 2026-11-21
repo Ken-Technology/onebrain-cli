@@ -1,5 +1,5 @@
 import { spawn } from 'node:child_process';
-import { mkdirSync, openSync } from 'node:fs';
+import { mkdirSync, openSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
@@ -26,10 +26,59 @@ const isClient = (name: string): name is ClientName => NAMES.includes(name as Cl
 const tilde = (home: string, path: string) =>
   path.startsWith(home) ? `~${path.slice(home.length)}` : path;
 
+/** The clients whose sessions the One Brain Mac app can upload itself. */
+const DESKTOP_CAPTURES: ClientName[] = ['claude-code', 'codex', 'cursor'];
+/** How long the app's marker is believed after the app last wrote it. */
+const DESKTOP_SEEN_MS = 7 * 24 * 3600_000;
+
+/** True while a process with this id runs (EPERM: it runs, as another user). */
+function alive(pid: number): boolean {
+  if (!Number.isInteger(pid) || pid <= 0) return false;
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch (error) {
+    return (error as NodeJS.ErrnoException).code === 'EPERM';
+  }
+}
+
+/**
+ * The clients whose sessions the Mac app captures now, by its marker
+ * ~/.config/onebrain/desktop.json:
+ * { "sessions": true, "tools": [...], "seenAt": "<time>", "pid": <n> }.
+ * The app lists the tools it captures (switched on there, and found) and writes the time at
+ * start, at each change and once a day while it runs, so the marker of an app that is gone goes
+ * stale by itself: nothing is the app's once `seenAt` is 7 days from now. A marker from before
+ * the list has neither: all three tools, never seen, so stale at once. A marker with a `pid` is
+ * the app's only while that process runs, so one a crash or a forced quit left behind is nobody's.
+ */
+function desktopCaptures(home: string): ClientName[] {
+  try {
+    const marker = JSON.parse(readFileSync(join(configDir(home), 'desktop.json'), 'utf8')) as {
+      sessions?: unknown;
+      tools?: unknown;
+      seenAt?: unknown;
+      pid?: unknown;
+    } | null;
+    if (marker?.sessions !== true) return [];
+    // The app's process: a marker a crash or a forced quit left behind is nobody's at once.
+    if (typeof marker.pid === 'number' && !alive(marker.pid)) return [];
+    const seenAt = typeof marker.seenAt === 'string' ? Date.parse(marker.seenAt) : Number.NaN;
+    if (!(Math.abs(Date.now() - seenAt) < DESKTOP_SEEN_MS)) return [];
+    const { tools } = marker;
+    return Array.isArray(tools)
+      ? DESKTOP_CAPTURES.filter((name) => tools.includes(name))
+      : DESKTOP_CAPTURES;
+  } catch {
+    return [];
+  }
+}
+
 /**
  * Called by a client's session-end hook (`init hook <client> [--private | --share-captures]`):
  * starts `capture` in the background and exits 0 whatever happens. The capture is --private
- * unless the hook says --share-captures.
+ * unless the hook says --share-captures. For a client the One Brain Mac app captures now
+ * (desktop.json), it does nothing.
  */
 export async function handleHook(
   args: string[],
@@ -39,6 +88,8 @@ export async function handleHook(
   try {
     const [name = '', ...flags] = args;
     if (!isClient(name)) return 0;
+    // The Mac app uploads this session itself; a second upload could land somewhere else.
+    if (desktopCaptures(io.home).includes(name)) return 0;
     const input = await io.readStdin();
     const session = input === null ? null : clients[name].readHook(input);
     if (session) {

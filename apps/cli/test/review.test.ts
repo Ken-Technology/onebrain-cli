@@ -80,6 +80,15 @@ describe('review', () => {
     expect(t.stdout()).toBe('accepted\nclients/acme/overview.md version 2\n');
   });
 
+  it('says so when accepting a private proposal only shared it for review', async () => {
+    const { api } = fakeApi({
+      [`POST ${W}/improvements/i1/accept`]: () => ({ body: { improvement, file: null } }),
+    });
+    const t = testIo({ api });
+    expect(await review.run(['accept', 'i1'], t.io)).toBe(0);
+    expect(t.stdout()).toBe('shared for review\nclients/acme/overview.md\n');
+  });
+
   it('keeps an improvement pending when the file moved on', async () => {
     const { api } = fakeApi({
       [`POST ${W}/improvements/i1/accept`]: () => ({

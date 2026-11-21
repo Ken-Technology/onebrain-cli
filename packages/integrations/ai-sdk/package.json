@@ -1,0 +1,74 @@
+{
+  "name": "@useonebrain/ai-sdk",
+  "version": "0.1.0",
+  "description": "Your team's One Brain in the Vercel AI SDK: search, read and remember tools, recall before each call, and session capture after each turn.",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "homepage": "https://useonebrain.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ken-Technology/onebrain-cli.git",
+    "directory": "packages/integrations/ai-sdk"
+  },
+  "keywords": [
+    "onebrain",
+    "ai",
+    "ai-sdk",
+    "vercel",
+    "agents",
+    "memory",
+    "knowledge-base",
+    "tools",
+    "middleware"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./mcp": "./src/mcp.ts"
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true,
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "./mcp": {
+        "types": "./dist/mcp.d.ts",
+        "default": "./dist/mcp.js"
+      }
+    },
+    "types": "./dist/index.d.ts"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "prepack": "pnpm run build",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@useonebrain/sdk": "workspace:^"
+  },
+  "peerDependencies": {
+    "@ai-sdk/mcp": "^2.0.0",
+    "ai": "^7.0.0",
+    "zod": "^3.25.76 || ^4.1.8"
+  },
+  "peerDependenciesMeta": {
+    "@ai-sdk/mcp": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@ai-sdk/mcp": "2.0.101",
+    "ai": "7.0.177",
+    "typescript": "5.9.3",
+    "zod": "4.6.7"
+  }
+}

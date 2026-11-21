@@ -1,0 +1,16 @@
+{
+  "extends": "../../../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "outDir": "dist",
+    "rootDir": "src",
+    "declaration": true,
+    "rewriteRelativeImportExtensions": true,
+    "lib": ["ES2023", "DOM"],
+    "types": [],
+    "paths": {
+      "@useonebrain/sdk": ["../../sdk/dist/index.d.ts"]
+    }
+  },
+  "include": ["src"]
+}

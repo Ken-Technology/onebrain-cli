@@ -1,6 +1,11 @@
 import { ApiError, apiUrl, CliError, type Command, connect, unwrap } from '../client.ts';
 import { writeConfig } from '../config.ts';
-import { createCredentialStore, discover } from '../credentials.ts';
+import {
+  createCredentialStore,
+  discover,
+  RefreshLockBusy,
+  withRefreshLock,
+} from '../credentials.ts';
 
 type Tokens = { accessToken: string; refreshToken: string | null; expiresAt: string };
 
@@ -88,31 +93,53 @@ export async function deviceLogin(options: DeviceLoginOptions): Promise<Tokens> 
   throw new CliError('The sign-in code expired. Run onebrain login again.');
 }
 
-async function findIssuer(url: string, env: Record<string, string | undefined>): Promise<string> {
-  if (env.OIDC_ISSUER) return env.OIDC_ISSUER;
-  const response = await fetch(`${url}/.well-known/oauth-protected-resource/mcp`);
-  const doc = response.ok
-    ? ((await response.json().catch(() => null)) as { authorization_servers?: string[] } | null)
-    : null;
-  const issuer = doc?.authorization_servers?.[0];
+type SignIn = { issuer: string; clientId: string; audience: string | null };
+
+const text = (value: unknown): string | null =>
+  typeof value === 'string' && value !== '' ? value : null;
+
+/**
+ * The issuer, the CLI's client id and the audience. A variable wins; what it leaves unset comes
+ * from the API's protected-resource document, fetched once and only when something is missing.
+ */
+export async function signInSettings(
+  url: string,
+  env: Record<string, string | undefined>,
+  fetchFn: typeof fetch,
+): Promise<SignIn> {
+  const set = {
+    issuer: env.OIDC_ISSUER || null,
+    clientId: env.ONEBRAIN_CLI_CLIENT_ID || null,
+    audience: env.OIDC_AUDIENCE || null,
+  };
+  let doc: Record<string, unknown> | null = null;
+  if (!set.issuer || !set.clientId || !set.audience) {
+    const response = await fetchFn(`${url}/.well-known/oauth-protected-resource/mcp`);
+    const body: unknown = response.ok ? await response.json().catch(() => null) : null;
+    if (body && typeof body === 'object') doc = body as Record<string, unknown>;
+  }
+  const servers = doc?.authorization_servers;
+  const clientId = set.clientId ?? text(doc?.onebrain_cli_client_id);
+  if (!clientId) {
+    throw new CliError(
+      `Set ONEBRAIN_CLI_CLIENT_ID to the One Brain CLI client id, or ask the admin of ${url} to set OIDC_CLI_CLIENT_ID.`,
+      2,
+    );
+  }
+  const issuer = set.issuer ?? text(Array.isArray(servers) ? servers[0] : null);
   if (!issuer) {
     throw new CliError(`Set OIDC_ISSUER: ${url} does not publish its sign-in metadata yet.`);
   }
-  return issuer;
+  return { issuer, clientId, audience: set.audience ?? text(doc?.onebrain_audience) };
 }
 
 export default {
   name: 'login',
   describe:
-    'Sign in with your browser (device authorization)\n\nUsage: onebrain login\n\nNeeds ONEBRAIN_CLI_CLIENT_ID. Reads OIDC_ISSUER (else asks the API) and OIDC_AUDIENCE.\nONEBRAIN_URL sets the API (default http://localhost:8787).',
+    'Sign in with your browser (device authorization)\n\nUsage: onebrain login\n\nONEBRAIN_URL sets the API (default http://localhost:8787). The API publishes the issuer, the CLI client id\nand the audience; ONEBRAIN_CLI_CLIENT_ID, OIDC_ISSUER and OIDC_AUDIENCE override them when set.',
   run: async (_args, io) => {
-    const clientId = io.env.ONEBRAIN_CLI_CLIENT_ID;
-    if (!clientId) {
-      throw new CliError('Set ONEBRAIN_CLI_CLIENT_ID to the One Brain CLI client id.', 2);
-    }
     const url = apiUrl(io.env, io.home);
-    const issuer = await findIssuer(url, io.env);
-    const audience = io.env.OIDC_AUDIENCE || null;
+    const { issuer, clientId, audience } = await signInSettings(url, io.env, fetch);
     const tokens = await deviceLogin({
       issuer,
       clientId,
@@ -122,7 +149,13 @@ export default {
       show: (uri, code) => io.stderr(`Open ${uri} and confirm the code ${code}.\n`),
     });
     const store = createCredentialStore({ home: io.home, env: io.env });
-    const where = await store.save({ url, issuer, clientId, audience, ...tokens });
+    const save = () => store.save({ url, issuer, clientId, audience, ...tokens });
+    // Under the lock the CLI and the Mac app refresh under, so a refresh of an older login is
+    // never written over this one. A lock that stays held does not cost the sign-in.
+    const where = await withRefreshLock({ home: io.home }, save).catch((error: unknown) => {
+      if (error instanceof RefreshLockBusy) return save();
+      throw error;
+    });
     writeConfig(io.home, { url });
 
     const api = connect(url, tokens.accessToken);

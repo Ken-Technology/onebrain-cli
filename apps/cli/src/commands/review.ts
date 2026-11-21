@@ -58,7 +58,12 @@ async function accept(
         body: body === undefined ? {} : { body },
       }),
     );
-    io.stdout(`accepted\n${result.file.path} version ${result.file.version}\n`);
+    const { improvement, file } = result;
+    io.stdout(
+      file
+        ? `accepted\n${file.path} version ${file.version}\n`
+        : `${improvement.status === 'accepted' ? 'accepted' : 'shared for review'}\n${improvement.path}\n`,
+    );
     return 0;
   } catch (error) {
     if (error instanceof ApiError && error.code === 'conflict') {

@@ -5,8 +5,11 @@ import { findAgent, pick, table, usage } from './shared.ts';
 const USAGE = `Usage: onebrain admin keys list <agent> [--json]
        onebrain admin keys create <agent> [--scope read|write|remember]... [--path-prefix <path>] [--expires <ISO date>]
        onebrain admin keys revoke <agent> <key id>
+       onebrain admin keys resume <agent> <key id>
 
-Only the agent's owner can create its keys. An admin can list and revoke any agent's keys.`;
+Only the agent's owner can create its keys. An admin can list and revoke any agent's keys, and
+resume a key that was paused after large deletions. The last column of the list is when a key was
+paused.`;
 
 const SCOPES = ['read', 'write', 'remember'] as const;
 
@@ -55,6 +58,7 @@ export async function run(args: string[], io: Io): Promise<number> {
               k.expiresAt ?? '-',
               k.lastUsedAt ?? '-',
               k.revokedAt ?? '-',
+              k.pausedAt ?? '-',
             ]),
           ),
     );
@@ -89,7 +93,7 @@ export async function run(args: string[], io: Io): Promise<number> {
     return 0;
   }
 
-  if (action === 'revoke' && keyId) {
+  if ((action === 'revoke' || action === 'resume') && keyId) {
     const { api, workspace } = await io.client();
     const agent = await findAgent(api, workspace, agentName);
     const path = { workspace, id: agent.id };
@@ -98,12 +102,17 @@ export async function run(args: string[], io: Io): Promise<number> {
     );
     const key = data.find((k) => k.keyId === keyId || k.id === keyId);
     if (!key) throw new CliError(`No key ${keyId}.`);
-    unwrap(
-      await api.DELETE('/v1/workspaces/{workspace}/agents/{id}/keys/{keyId}', {
-        params: { path: { ...path, keyId: key.keyId } },
-      }),
-    );
-    io.stdout('revoked\n');
+    const params = { path: { ...path, keyId: key.keyId } };
+    if (action === 'revoke') {
+      unwrap(await api.DELETE('/v1/workspaces/{workspace}/agents/{id}/keys/{keyId}', { params }));
+      io.stdout('revoked\n');
+    } else {
+      // Workspace admins only. A key that is not paused is left as it is.
+      unwrap(
+        await api.POST('/v1/workspaces/{workspace}/agents/{id}/keys/{keyId}/resume', { params }),
+      );
+      io.stdout('resumed\n');
+    }
     return 0;
   }
 

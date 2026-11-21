@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import admin from '../src/commands/admin.ts';
 import { fakeApi, testIo } from './helpers.ts';
 
+// Built at run time from two parts: a whole key-shaped literal here would match One Brain's own-key rule.
+const NEW_KEY = `${'ob_abc123def456'}${'_0123456789abcdefghijABCDEFGHIJ0123'}`;
 const W = '/v1/workspaces/kenso';
 const ORG = '0b5e0000-0000-4000-8000-000000000001';
 const at = '2026-11-13T00:00:00.000Z';
@@ -209,6 +211,10 @@ describe('admin members and groups', () => {
     expect(await admin.run(['groups', 'nope'], t.io)).toBe(2);
     expect(await admin.run(['groups', 'create'], t.io)).toBe(2);
     expect(t.stderr()).toContain('Usage');
+    expect(await admin.run(['loop', 'nope'], t.io)).toBe(2);
+    expect(t.stderr()).toContain(
+      'Areas: workspace, members, groups, agents, keys, folders, grants, access, loop.',
+    );
   });
 });
 
@@ -290,7 +296,7 @@ describe('admin agents and keys', () => {
       [`GET ${W}/agents`]: () => ({ body: { data: [agent] } }),
       [`POST ${W}/agents/ag1/keys`]: () => ({
         status: 201,
-        body: { ...key, key: 'ob_abc123def456_0123456789abcdefghijABCDEFGHIJ0123' },
+        body: { ...key, key: NEW_KEY },
       }),
     });
     const t = testIo({ api });
@@ -301,7 +307,7 @@ describe('admin agents and keys', () => {
       ),
     ).toBe(0);
     expect(calls[1]?.body).toEqual({ scopes: ['read', 'remember'] });
-    expect(t.stdout()).toBe('ob_abc123def456_0123456789abcdefghijABCDEFGHIJ0123\n');
+    expect(t.stdout()).toBe(`${NEW_KEY}\n`);
     expect(t.stderr()).toContain('Key id abc123def456.');
     expect(t.stderr()).toContain('not shown again');
     expect(await admin.run(['keys', 'create', 'a-claude', '--scope', 'root'], t.io)).toBe(2);
@@ -322,7 +328,7 @@ describe('admin agents and keys', () => {
       [`GET ${W}/agents`]: () => ({ body: { data: [agent] } }),
       [`POST ${W}/agents/ag1/keys`]: () => ({
         status: 201,
-        body: { ...key, key: 'ob_abc123def456_0123456789abcdefghijABCDEFGHIJ0123' },
+        body: { ...key, key: NEW_KEY },
       }),
       [`GET ${W}/agents/ag1/keys`]: () => ({ body: { data: [key] } }),
       [`DELETE ${W}/agents/ag1/keys/abc123def456`]: () => ({ status: 204 }),
@@ -355,7 +361,40 @@ describe('admin agents and keys', () => {
     });
     const t = testIo({ api });
     expect(await admin.run(['keys', 'list', 'a-claude'], t.io)).toBe(0);
-    expect(t.stdout()).toBe('abc123def456  read,write  clients  -  -  -\n');
+    expect(t.stdout()).toBe('abc123def456  read,write  clients  -  -  -  -\n');
+  });
+
+  it('shows a paused key in the list and resumes it by its public key id', async () => {
+    const key = {
+      id: 'k1',
+      keyId: 'abc123def456',
+      scopes: ['read', 'write'],
+      pathPrefix: null,
+      expiresAt: null,
+      lastUsedAt: null,
+      revokedAt: null,
+      createdAt: at,
+      pausedAt: at,
+      pauseReason: 'large_deletions',
+    };
+    const { api, calls } = fakeApi({
+      [`GET ${W}/agents`]: () => ({ body: { data: [agent] } }),
+      [`GET ${W}/agents/ag1/keys`]: () => ({ body: { data: [key] } }),
+      [`POST ${W}/agents/ag1/keys/abc123def456/resume`]: () => ({
+        body: { ...key, pausedAt: null, pauseReason: null },
+      }),
+    });
+    const t = testIo({ api });
+    expect(await admin.run(['keys', 'list', 'a-claude'], t.io)).toBe(0);
+    expect(t.stdout()).toBe(`abc123def456  read,write  -  -  -  -  ${at}\n`);
+    expect(await admin.run(['keys', 'resume', 'a-claude', 'k1'], t.io)).toBe(0);
+    expect(calls.at(-1)?.method).toBe('POST');
+    expect(calls.at(-1)?.path).toBe(`${W}/agents/ag1/keys/abc123def456/resume`);
+    expect(t.stdout()).toContain('resumed\n');
+    await expect(admin.run(['keys', 'resume', 'a-claude', 'nope'], t.io)).rejects.toThrow(
+      'No key nope.',
+    );
+    expect(await admin.run(['keys', 'resume', 'a-claude'], t.io)).toBe(2);
   });
 });
 

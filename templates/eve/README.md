@@ -32,15 +32,15 @@ The model is eve's default, `anthropic/claude-fable-5.2` through Vercel's AI Gat
 
 ## Run it
 
-Deploy with the button above, or run it on your machine with Node 24:
+Deploy with the button above, or run it on your machine with Node 24 and pnpm:
 
 ```bash
-npm install
+pnpm install
 cp .env.example .env.local   # then fill in ONEBRAIN_API_KEY
-npm run dev
+pnpm dev
 ```
 
-`npm run dev` runs `eve dev`, which reads `.env.local`. There is no lockfile yet: the template's first lockfile comes once `@useonebrain/eve` is published to npm, so the install resolves the newest versions its ranges allow.
+`pnpm dev` runs `eve dev`, which reads `.env.local`. `pnpm-lock.yaml` pins the published `eve` and `@useonebrain/eve`, as eve's own templates do.
 
 ## From the first message to the captured turn
 
@@ -74,8 +74,8 @@ This template starts from eve's memory-agent template, as it is in the eve repo 
 
 - **Kept as is:** `agent/agent.ts`, the eve channel, the current-time instruction, the sandbox, the `agent`, `web_fetch`, `web_search`, `write_file` and `edit_file` tools, `tsconfig.json`, `.gitignore` and `.vercelignore`.
 - **Replaced:** the two file-based memories (user and channel preferences), by One Brain's memory slot and skills (`agent/memory/onebrain.ts`, `agent/skills/onebrain.ts`). `agent/instructions.md` is rewritten for One Brain, and `.env.example` holds the One Brain variables instead of Slack's.
-- **Removed:** the Slack channel and its helpers under `agent/lib`, the memory scope, the tests and evals, the lint, format, knip and lefthook setup with their dev dependencies, `AGENTS.md`, `CLAUDE.md`, `CUSTOMIZATION.md`, the lockfile, and the `@vercel/connect` and `zod` dependencies only the removed files used.
-- **Added:** the `@useonebrain/eve` dependency. The package is renamed `onebrain-eve-agent` and marked private, and `pnpm-workspace.yaml` lets pnpm install `@useonebrain/*` releases as soon as they're published.
+- **Removed:** the Slack channel and its helpers under `agent/lib`, the memory scope, the tests and evals, the lint, format, knip and lefthook setup with their dev dependencies, `AGENTS.md`, `CLAUDE.md`, `CUSTOMIZATION.md`, and the `@vercel/connect` and `zod` dependencies only the removed files used.
+- **Added:** the `@useonebrain/eve` dependency. The package is renamed `onebrain-eve-agent` and marked private, and `pnpm-workspace.yaml` lets pnpm install `@useonebrain/*` releases as soon as they're published. `pnpm-lock.yaml` is regenerated for the new dependencies.
 
 ## License
 

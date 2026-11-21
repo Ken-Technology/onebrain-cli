@@ -43,9 +43,9 @@ To stop capturing, pass `capture: false` to `withOneBrain`. The package's [READM
 
 ## For maintainers
 
-This template has no lockfile yet: `@useonebrain/ai-sdk` is not on npm until its first publish, so `npm install` cannot resolve `^0.1.0`. DEV-13094 generates the lockfile after that publish.
+`package-lock.json` pins the published `@useonebrain/sdk` and `@useonebrain/ai-sdk`. After a release, run `npm update --package-lock-only` here and commit the lockfile.
 
-Until then, try it from this repo with packed tarballs:
+To try a change to the packages before it is released, install them from this repo as packed tarballs:
 
 ```bash
 pnpm --filter @useonebrain/sdk pack --pack-destination /tmp/onebrain-tarballs

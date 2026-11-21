@@ -33,8 +33,6 @@ Create the project:
 npm create cloudflare@latest -- --template https://github.com/Ken-Technology/onebrain-cli/templates/cloudflare
 ```
 
-**No lockfile yet.** `@useonebrain/cloudflare` is not on npm yet, so the template has no `package-lock.json`, and both the Deploy button and `npm create` fail at `npm install` until it is published (DEV-13094). A lockfile comes with the first release.
-
 Set the secrets for local runs:
 
 ```bash

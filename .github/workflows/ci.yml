@@ -2,9 +2,10 @@ name: CI
 
 # GitHub-hosted on purpose: this repo is public, so hosted minutes are free,
 # and a fork PR must never run its code on Kenso's self-hosted pools. The job
-# runs the repo's own scripts (typecheck, test, the SDK generator) and the
-# README's --help smoke. There is no lint or build script: Node runs the
-# TypeScript sources directly.
+# runs the repo's own scripts (typecheck, test, the SDK generator), the
+# README's --help smoke and the npm pack check. There is no lint script, and
+# nothing builds for the tests: Node runs the TypeScript sources directly. The
+# npm packages build their dist/ only when packed, which the pack check does.
 
 on:
   pull_request:
@@ -25,7 +26,9 @@ jobs:
     # Named CI like the other Kenso repos' required check.
     name: CI
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    # The tests pack and install each npm package and the pack check builds
+    # them again, so the job gets more room than the old 10 minutes.
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -51,8 +54,16 @@ jobs:
       - name: SDK schema matches openapi.json
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: |
-          pnpm --filter @onebrain/sdk generate
+          pnpm --filter @useonebrain/sdk generate
           git diff --exit-code -- packages/sdk/src/schema.ts
       - name: CLI starts
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: node apps/cli/src/index.ts --help
+      # What npm would get: each public package packed as pnpm publish packs it
+      # (prepack builds dist/), then checked: exports and types point at dist/
+      # files in the tarball, no workspace: range is left, and nothing but
+      # dist/, package.json, README.md and LICENSE is in it. release.yml runs
+      # the same script before it publishes.
+      - name: npm packages pack
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: node scripts/check-packs.mjs

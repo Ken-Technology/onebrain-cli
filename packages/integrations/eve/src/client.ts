@@ -1,5 +1,15 @@
 import { createOneBrain, DEFAULT_URL, type OneBrain, OneBrainError } from '@useonebrain/sdk';
 
+/**
+ * The URL without trailing slashes. A loop, not a regex: `/\/+$/` takes quadratic time on a long
+ * run of slashes.
+ */
+function withoutTrailingSlashes(url: string): string {
+  let end = url.length;
+  while (end > 0 && url[end - 1] === '/') end -= 1;
+  return url.slice(0, end);
+}
+
 /** What an `apiKey` function receives: the eve session the call runs in, with its signed-in caller. */
 export type OneBrainCallContext = {
   readonly session: {
@@ -46,7 +56,7 @@ export function env(name: string): string | undefined {
 
 /** The API's base URL, without a trailing slash. */
 export function baseUrl(options: ConnectionOptions): string {
-  return (options.url ?? env('ONEBRAIN_URL') ?? DEFAULT_URL).replace(/\/+$/, '');
+  return withoutTrailingSlashes(options.url ?? env('ONEBRAIN_URL') ?? DEFAULT_URL);
 }
 
 /** The key for a request made in `context`: the option, else env ONEBRAIN_API_KEY, else a clear error. */

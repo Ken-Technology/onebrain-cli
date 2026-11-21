@@ -1,6 +1,16 @@
 import { createOneBrain, DEFAULT_URL, type OneBrain } from '@useonebrain/sdk';
 
 /**
+ * The URL without trailing slashes. A loop, not a regex: `/\/+$/` takes quadratic time on a long
+ * run of slashes.
+ */
+function withoutTrailingSlashes(url: string): string {
+  let end = url.length;
+  while (end > 0 && url[end - 1] === '/') end -= 1;
+  return url.slice(0, end);
+}
+
+/**
  * The bindings this package reads when no option names a value: the same names as the onebrain CLI.
  * Pass the agent's `this.env`. Each is read when it is first needed, never at import or
  * construction, so a build without secrets works.
@@ -33,9 +43,8 @@ const present = (value: unknown): string | undefined =>
 
 /** The base URL, without a trailing slash. */
 export function urlOf(options: ConnectOptions): string {
-  return (present(options.url) ?? present(options.env?.ONEBRAIN_URL) ?? DEFAULT_URL).replace(
-    /\/+$/,
-    '',
+  return withoutTrailingSlashes(
+    present(options.url) ?? present(options.env?.ONEBRAIN_URL) ?? DEFAULT_URL,
   );
 }
 

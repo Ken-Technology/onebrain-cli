@@ -1,5 +1,10 @@
 packages:
   - apps/*
   - packages/*
+  - packages/integrations/*
 allowBuilds:
   esbuild: true
+  core-js-pure: false
+  workerd: false
+minimumReleaseAgeExclude:
+  - eve@1.2.0

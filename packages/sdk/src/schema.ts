@@ -52,6 +52,140 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/workspaces/{workspace}/nodes/move": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["moveNode"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/workspaces/{workspace}/deleted": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description What was deleted in the last 30 days and the caller may restore: one entry per delete, the folder standing for everything deleted with it. A caller who may not restore an entry does not see it. */
+        get: operations["listDeleted"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/workspaces/{workspace}/deleted/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Brings a deleted file, folder or skill back to the path it had, with everything deleted with it. A person only, with edit on a file and manage on a folder or a skill. */
+        post: operations["restoreNode"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/workspaces/{workspace}/tags": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listTags"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/workspaces/{workspace}/nodes/meta": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getNodeMeta"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** @description Sets the fields given; null clears one. Tags and the description need edit. Sensitivity, reviewBy and reviewEveryDays need manage and a person: 403 forbidden when a field needs more than the caller has, and then nothing is changed. */
+        patch: operations["updateNodeMeta"];
+        trace?: never;
+    };
+    "/v1/workspaces/{workspace}/nodes/reviewed": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Marks the node reviewed now and moves its review date on by the cadence that applies, or clears the date when there is none. Needs edit on the node: a folder reviewer without edit is refused. */
+        post: operations["markReviewed"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/workspaces/{workspace}/graph": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description The folders, files and skills the caller can read under a folder, newest change first up to the limit, with the folders that connect them; and the edges between them. Nothing the caller cannot read is in it, as a node or as the end of an edge. 404 for a folder the caller cannot read. */
+        get: operations["getGraph"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/workspaces/{workspace}/graph/memories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description The memories that cite a node, among those the caller can read. 404 for a node the caller cannot read. */
+        get: operations["listGraphMemories"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/workspaces/{workspace}/files": {
         parameters: {
             query?: never;
@@ -100,6 +234,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/workspaces/{workspace}/files/original": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description The bytes of a file's original, at its current or the asked version: the newest original at or before that version. Always a download, never shown inline. Answers 404 for a file with no original and when this server stores no originals. */
+        get: operations["getOriginal"];
+        /** @description A new version of a file from uploaded bytes (a PDF, a Word or Excel file, a board) and the text the client read from them. The type is read from the bytes and must match the extension of the path. People only, never an agent key or an MCP client, and never inside a skill folder. Answers 404 when this server stores no originals. */
+        put: operations["putOriginal"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/workspaces/{workspace}/memories": {
         parameters: {
             query?: never;
@@ -107,7 +259,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        get: operations["listMemories"];
         put?: never;
         post: operations["remember"];
         delete?: never;
@@ -142,6 +294,38 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["forget"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/workspaces/{workspace}/memories/{id}/accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["acceptMemory"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/workspaces/{workspace}/memories/{id}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["rejectMemory"];
         delete?: never;
         options?: never;
         head?: never;
@@ -276,7 +460,55 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/v1/workspaces/{workspace}/sources": {
+    "/v1/workspaces/{workspace}/skills/{name}/files": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["publishSkill"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/workspaces/{workspace}/skills/{name}/releases": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listSkillReleases"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/workspaces/{workspace}/skills/{name}/releases/{version}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getSkillRelease"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/workspaces/{workspace}/skills/{name}/releases/{version}/restore": {
         parameters: {
             query?: never;
             header?: never;
@@ -285,8 +517,42 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        post: operations["restoreSkillRelease"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/workspaces/{workspace}/sources": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listSources"];
+        put?: never;
+        /** @description Stores a session transcript or an upload. Content over SOURCE_MAX_BYTES (8,000,000 bytes by default) is refused with 413 source_too_large. */
         post: operations["createSource"];
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/workspaces/{workspace}/sources/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getSource"];
+        put?: never;
+        post?: never;
+        /** @description Deletes a session or an upload for good, with every quote taken from it and every memory learned only from it. Needs write access to its folder; a private one only its owner deletes. Each delete by an agent key counts toward the key's pause: the one that would be its third counted event in 10 minutes, or its 30th in 24 hours, pauses the key instead and answers 403 key_paused, and nothing is deleted. */
+        delete: operations["deleteSource"];
         options?: never;
         head?: never;
         patch?: never;
@@ -305,7 +571,7 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        patch?: never;
+        patch: operations["updateMe"];
         trace?: never;
     };
     "/v1/me/workspace": {
@@ -385,6 +651,22 @@ export interface paths {
         delete: operations["removeMember"];
         options?: never;
         head?: never;
+        patch: operations["updateMember"];
+        trace?: never;
+    };
+    "/v1/workspaces/{workspace}/leave": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["leaveWorkspace"];
+        delete?: never;
+        options?: never;
+        head?: never;
         patch?: never;
         trace?: never;
     };
@@ -417,7 +699,7 @@ export interface paths {
         delete: operations["deleteGroup"];
         options?: never;
         head?: never;
-        patch?: never;
+        patch: operations["updateGroup"];
         trace?: never;
     };
     "/v1/workspaces/{workspace}/groups/{id}/members": {
@@ -481,7 +763,7 @@ export interface paths {
         delete: operations["deleteAgent"];
         options?: never;
         head?: never;
-        patch?: never;
+        patch: operations["updateAgent"];
         trace?: never;
     };
     "/v1/workspaces/{workspace}/agents/{id}/keys": {
@@ -516,6 +798,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/workspaces/{workspace}/agents/{id}/keys/{keyId}/resume": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["resumeKey"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/workspaces/{workspace}/keys": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listAllKeys"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/workspaces/{workspace}/grants": {
         parameters: {
             query?: never;
@@ -527,6 +841,71 @@ export interface paths {
         put: operations["putGrant"];
         post?: never;
         delete: operations["deleteGrant"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/workspaces/{workspace}/access/explain": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["explainAccess"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/workspaces/{workspace}/readers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listReaders"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/workspaces/{workspace}/access/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listAccessHistory"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/workspaces/{workspace}/reviewers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listReviewers"];
+        /** @description Makes a person or a group a reviewer of a folder. With reviewers, only they (and a workspace admin who can write there) accept improvements under it. A person who manages the folder only. */
+        put: operations["putReviewer"];
+        post?: never;
+        delete: operations["deleteReviewer"];
         options?: never;
         head?: never;
         patch?: never;
@@ -603,7 +982,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        get: operations["getWorkspace"];
         put?: never;
         post?: never;
         delete: operations["deleteWorkspace"];
@@ -622,6 +1001,270 @@ export interface paths {
         get: operations["getEmbeddingSettings"];
         put: operations["putEmbeddingSettings"];
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/workspaces/{workspace}/loop/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getLoopSettings"];
+        put: operations["putLoopSettings"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/workspaces/{workspace}/loop/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getLoopStatus"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/workspaces/{workspace}/loop/run": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["runLoop"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/workspaces/{workspace}/loop/locks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listLoopLocks"];
+        put?: never;
+        post: operations["lockForLoop"];
+        delete: operations["unlockForLoop"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/workspaces/{workspace}/loop/overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getLoopOverview"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/workspaces/{workspace}/loop/activity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getLoopActivity"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/workspaces/{workspace}/loop/usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getLoopUsage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/workspaces/{workspace}/analytics/overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description The workspace's totals for the window, by day and by channel, for every member. A read of a private file counts in the totals and is never tied to the file. No search text is stored, so none is shown. */
+        get: operations["getAnalyticsOverview"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/workspaces/{workspace}/analytics/files": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description The most read files in the window, among the files the caller can read. A private file is never listed. 404 for a folder the caller cannot read. */
+        get: operations["listFileActivity"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/workspaces/{workspace}/analytics/file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description The reads of one file in the window, by day. people, who read it, is for a workspace admin only and null for everyone else. 404 for a file the caller cannot read. */
+        get: operations["getFileActivity"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/workspaces/{workspace}/analytics/review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description How many of the files the caller can read are past their review date, within 14 days of it, or without one, and how many were marked reviewed in the last 30 days. 404 for a folder the caller cannot read. */
+        get: operations["getReviewStats"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/workspaces/{workspace}/analytics/people": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description What each person and agent did in the window. A workspace admin gets every row; anyone else gets their own row only. */
+        get: operations["listPeopleActivity"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/workspaces/{workspace}/analytics/skills": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description The most read skills in the window, among the skills the caller can read. */
+        get: operations["listSkillActivity"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/workspaces/{workspace}/analytics/skills/{name}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description The reads of one skill in the window, by day and channel. people, who read it, is for a workspace admin only and null for everyone else. 404 for a skill the caller cannot read. */
+        get: operations["getSkillActivity"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/workspaces/{workspace}/capture/config": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getCaptureConfig"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/workspaces/{workspace}/transcription/token": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description A Deepgram token that lives at most 600 seconds, for one prerecorded transcription the One Brain app sends straight to Deepgram. A person in the workspace only; an agent key gets 403. 404 when this server has no DEEPGRAM_API_KEY. 503 busy when Deepgram does not answer. */
+        post: operations["createTranscriptionToken"];
         delete?: never;
         options?: never;
         head?: never;
@@ -648,6 +1291,41 @@ export interface components {
             currentVersion: number | null;
             /** Format: date-time */
             updatedAt: string;
+            owner: components["schemas"]["Ref"] | null;
+            /**
+             * @description The caller's own level on the node
+             * @enum {string}
+             */
+            level: "view" | "edit" | "manage";
+            /** @description The node or a folder above it is restricted. Always false under me/ */
+            restricted: boolean;
+            /** @description UTF-8 bytes of a file's current version; null for a folder, a skill and a version written before sizes were stored */
+            sizeBytes: number | null;
+            fileCount?: number | null;
+            /** @description The newest original of a file (its uploaded bytes); null when it has none */
+            original: components["schemas"]["Original"] | null;
+            tags: string[];
+            /**
+             * @description A label. It changes no access
+             * @enum {string|null}
+             */
+            sensitivity: "public" | "internal" | "confidential" | null;
+            /**
+             * Format: date
+             * @description A date, YYYY-MM-DD
+             */
+            reviewBy: string | null;
+        };
+        Ref: {
+            /** Format: uuid */
+            id: string;
+            displayName: string;
+        };
+        Original: {
+            /** @description The file version the bytes were uploaded with. Lower than the file's version when its text changed afterwards */
+            version: number;
+            mediaType: string;
+            sizeBytes: number;
         };
         Error: {
             error: {
@@ -655,6 +1333,33 @@ export interface components {
                 message: string;
                 /** @description On 409: the version the file is at */
                 currentVersion?: number;
+                /**
+                 * @description On 429 too_many_requests: the limit the key is over
+                 * @enum {string}
+                 */
+                kind?: "write" | "search";
+                /** @description On 429 too_many_requests: calls of that kind allowed a minute. On 413 file_too_large from PUT files/original: the largest size in bytes that reason allows */
+                limit?: number;
+                /** @description On 429 too_many_requests: seconds to wait, as in Retry-After */
+                retryAfterSeconds?: number;
+                /** @description On 413 file_too_large and source_too_large: the size of the body in UTF-8 bytes */
+                sizeBytes?: number;
+                /** @description On 413 file_too_large and source_too_large: the largest body this server stores */
+                maxBytes?: number;
+                /**
+                 * @description On 403 key_paused: why the key is paused (large_deletions). On 403 forbidden from an accept or a dismiss: own_proposal, the caller asked for this review; not_reviewer, the folder has reviewers and the caller is not one. On 409 conflict from a restore: path_taken, a live node holds the path; name_taken, a live skill holds the name. On 409 conflict from PUT reviewers: cannot_write, that reviewer cannot write there. On 400 invalid_request from PUT files/original: unsupported_type, type_mismatch, macro, in_skill. On 413 file_too_large from PUT files/original: original, the bytes are over ORIGINAL_MAX_BYTES; quota, the workspace's originals are full; storage_full, the server's disk is near full. On 403 not_invited: email_unverified, the identity provider has not verified the email the caller signed in with, so no membership was claimed
+                 * @enum {string}
+                 */
+                reason?: "large_deletions" | "own_proposal" | "not_reviewer" | "path_taken" | "name_taken" | "cannot_write" | "unsupported_type" | "type_mismatch" | "macro" | "in_skill" | "original" | "quota" | "storage_full" | "email_unverified";
+                /**
+                 * Format: date-time
+                 * @description On 403 key_paused: when the key was paused
+                 */
+                pausedAt?: string;
+                /** @description On 403 and 404: why access was refused, and what would help */
+                access?: {
+                    [key: string]: unknown;
+                };
             };
         };
         CreateFolderBody: {
@@ -673,6 +1378,150 @@ export interface components {
             /** @enum {string} */
             writePolicy?: "review" | "direct" | "inherit";
         };
+        MoveNodeBody: {
+            path: string;
+            /** @description The new path. A new name in the same folder is a rename */
+            to: string;
+        };
+        DeletedNode: {
+            /**
+             * Format: uuid
+             * @description Restore takes it: the path may be taken again
+             */
+            id: string;
+            /** @enum {string} */
+            kind: "file" | "folder" | "skill";
+            name: string;
+            /** @description The path it had and gets back */
+            path: string;
+            /** @enum {string} */
+            visibility: "workspace" | "private";
+            /** Format: date-time */
+            deletedAt: string;
+            /**
+             * Format: date-time
+             * @description deletedAt plus 30 days: gone for good from then on
+             */
+            purgeAt: string;
+            /** @description Nodes in the batch, itself included */
+            count: number;
+        };
+        RestoreNodeBody: {
+            /**
+             * Format: uuid
+             * @description A deleted node's id, from GET deleted
+             */
+            id: string;
+        };
+        NodeMetaDetail: {
+            path: string;
+            tags: string[];
+            /** @enum {string|null} */
+            sensitivity: "public" | "internal" | "confidential" | null;
+            /** @description Decrypted here only, never in a listing */
+            description: string | null;
+            /** Format: date */
+            reviewBy: string | null;
+            /** @description The node's own */
+            reviewEveryDays: number | null;
+            /** @description The cadence that applies: the node's own or the nearest folder's above; from is that node's path. Null when it comes from a folder the caller cannot see; Mark reviewed still moves reviewBy by its days */
+            reviewEvery: {
+                days: number;
+                from: string;
+            } | null;
+            /** Format: date-time */
+            reviewedAt: string | null;
+            reviewedBy: components["schemas"]["Ref"] | null;
+            can: {
+                edit: boolean;
+                manage: boolean;
+            };
+        };
+        UpdateNodeMetaBody: {
+            path: string;
+            tags?: string[] | null;
+            description?: string | null;
+            /** @enum {string|null} */
+            sensitivity?: "public" | "internal" | "confidential" | null;
+            /** Format: date */
+            reviewBy?: string | null;
+            reviewEveryDays?: number | null;
+        };
+        MarkReviewedBody: {
+            path: string;
+        };
+        Graph: {
+            nodes: components["schemas"]["GraphNode"][];
+            edges: components["schemas"]["GraphEdge"][];
+            /** @description true when there was more than the reply holds: ask for a folder to see more */
+            truncated: boolean;
+        };
+        GraphNode: {
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            kind: "folder" | "file" | "skill";
+            name: string;
+            path: string;
+            /**
+             * Format: uuid
+             * @description The id of the node that holds it; null for the node the picture starts at
+             */
+            parent: string | null;
+            /** @description Memories the caller can read that cite it */
+            memories: number;
+        };
+        GraphEdge: {
+            /** Format: uuid */
+            from: string;
+            /** Format: uuid */
+            to: string;
+            /**
+             * @description contains: a folder or skill and what is in it, weight 1. related: two nodes the same memories cite, weight the number of memories they share
+             * @enum {string}
+             */
+            kind: "contains" | "related";
+            weight: number;
+        };
+        Memory: {
+            /** Format: uuid */
+            id: string;
+            text: string;
+            folder: string | null;
+            /** @enum {string} */
+            visibility: "workspace" | "private";
+            /** @enum {string} */
+            status: "unreviewed" | "accepted" | "rejected" | "retired";
+            /** Format: date-time */
+            validFrom: string;
+            /** Format: date-time */
+            validTo: string | null;
+            /** Format: uuid */
+            supersedesId: string | null;
+            /** @enum {string|null} */
+            kind: "fact" | "decision" | "preference" | "procedure" | "correction" | null;
+            source: components["schemas"]["SourceRef"] | null;
+            author: components["schemas"]["Ref"];
+            onBehalfOf: components["schemas"]["Ref"] | null;
+            /** Format: date-time */
+            createdAt: string;
+            evidence: components["schemas"]["Evidence"][];
+            decidedBy?: components["schemas"]["Ref"] | null;
+            /** Format: date-time */
+            decidedAt?: string | null;
+        };
+        SourceRef: {
+            kind: string;
+            ref: string | null;
+        };
+        Evidence: {
+            /** Format: uuid */
+            sourceId: string;
+            sourceKind: string;
+            quote: string;
+            /** Format: date-time */
+            at: string;
+        };
         File: {
             /** Format: uuid */
             id: string;
@@ -687,11 +1536,9 @@ export interface components {
             onBehalfOf: components["schemas"]["Ref"] | null;
             /** Format: date-time */
             updatedAt: string;
-        };
-        Ref: {
-            /** Format: uuid */
-            id: string;
-            displayName: string;
+            sizeBytes?: number | null;
+            /** @description The original this version reads from: the newest one at or before it; null when there is none */
+            original: components["schemas"]["Original"] | null;
         };
         Improvement: {
             /** Format: uuid */
@@ -704,13 +1551,23 @@ export interface components {
             status: "pending" | "accepted" | "dismissed" | "superseded";
             citations: components["schemas"]["Citation"][];
             proposedBy: components["schemas"]["Ref"];
-            decidedBy: components["schemas"]["Ref"] & ({
+            decidedBy: (components["schemas"]["Ref"] & {
                 email: string | null;
-            } | null);
+            }) | null;
             /** Format: date-time */
             decidedAt: string | null;
             /** Format: date-time */
             createdAt: string;
+            /** @enum {string} */
+            proposedByKind?: "user" | "agent" | "loop";
+            /** @description The person who asked for this review (putFile with propose, publishSkill with mode ask); null for every other proposal */
+            askedBy?: components["schemas"]["Ref"] | null;
+            /** @description The people who may accept it, with a workspace admin: the reviewers of the folder reviewersFrom names, a group as its members. Empty: see reviewersFrom */
+            reviewers: components["schemas"]["Ref"][];
+            /** @description The folder whose reviewers apply: the nearest at or above the file that has any. Null: none, so any writer may accept. Set with reviewers empty (a group nobody is in): only a workspace admin may */
+            reviewersFrom: string | null;
+            /** @description Still private to its owner, the caller: only they see it, and they may always accept it (which shares it) or dismiss it, whoever the reviewers are and whether or not they may write the file */
+            private?: boolean;
         };
         Citation: {
             /** @enum {string} */
@@ -732,6 +1589,8 @@ export interface components {
             title?: string;
             why?: string;
             citations?: components["schemas"]["Citation"][];
+            /** @description true: the write waits as a pending improvement, as an agent write in a review folder does */
+            propose?: boolean;
         };
         FileVersion: {
             version: number;
@@ -742,35 +1601,25 @@ export interface components {
             via: string;
             /** Format: date-time */
             createdAt: string;
+            sizeBytes?: number | null;
+            /** Format: uuid */
+            improvementId?: string | null;
         };
         RestoreFileBody: {
             path: string;
             version: number;
         };
-        Memory: {
-            /** Format: uuid */
-            id: string;
-            text: string;
-            folder: string | null;
-            /** @enum {string} */
-            visibility: "workspace" | "private";
-            /** @enum {string} */
-            status: "unreviewed" | "accepted" | "rejected" | "retired";
-            /** Format: date-time */
-            validFrom: string;
-            /** Format: date-time */
-            validTo: string | null;
-            /** Format: uuid */
-            supersedesId: string | null;
-            source: components["schemas"]["SourceRef"] | null;
-            author: components["schemas"]["Ref"];
-            onBehalfOf: components["schemas"]["Ref"] | null;
-            /** Format: date-time */
-            createdAt: string;
-        };
-        SourceRef: {
-            kind: string;
-            ref: string | null;
+        PutOriginalBody: {
+            path: string;
+            /** @description 0 to create; else the version the upload was based on */
+            baseVersion: number;
+            /** @description The text of the file, as the client read it from the bytes. putOriginal checks FILE_MAX_BYTES */
+            body: string;
+            /**
+             * Format: binary
+             * @description The bytes of a PDF, a Word or Excel file or a board, at most ORIGINAL_MAX_BYTES (15,000,000 by default; 413 file_too_large over it). The type is read from the bytes
+             */
+            file: string;
         };
         RememberBody: {
             text: string;
@@ -785,6 +1634,9 @@ export interface components {
             reason: string;
             correction?: string;
         };
+        RejectMemoryBody: {
+            reason?: string;
+        };
         SearchResult: {
             /** Format: uuid */
             id: string;
@@ -796,16 +1648,43 @@ export interface components {
             status: "accepted" | "unreviewed";
             source: components["schemas"]["SourceRef"] | null;
             score: number;
+            /** @enum {string} */
+            match?: "both" | "words" | "meaning";
+            /** Format: date-time */
+            updatedAt?: string;
+            title?: string | null;
         };
         SearchBody: {
             query: string;
             kinds?: ("file" | "skill" | "memory")[];
             folder?: string;
             limit?: number;
+            /** @enum {string} */
+            mode?: "hybrid" | "words";
+            tags?: string[];
+            sensitivity?: ("public" | "internal" | "confidential")[];
         };
         ImprovementDetail: components["schemas"]["Improvement"] & {
             newBody: string;
             currentBody: string;
+            edits?: components["schemas"]["ImprovementEdit"][];
+        };
+        ImprovementEdit: {
+            /** @enum {string} */
+            op: "replace";
+            find: string;
+            with: string;
+            quotes: components["schemas"]["EditQuote"][];
+        } | {
+            /** @enum {string} */
+            op: "insert";
+            afterHeading: string;
+            text: string;
+            quotes: components["schemas"]["EditQuote"][];
+        };
+        EditQuote: components["schemas"]["Evidence"] & {
+            /** Format: uuid */
+            memoryId: string;
         };
         AcceptImprovementBody: {
             body?: string;
@@ -820,11 +1699,61 @@ export interface components {
             version: number;
             /** Format: date-time */
             updatedAt: string;
+            owner?: components["schemas"]["Ref"] | null;
+            restricted?: boolean;
+            /** @enum {string} */
+            level?: "view" | "edit" | "manage";
         };
         SkillDetail: components["schemas"]["Skill"] & {
             files: {
                 /** @description Relative to the skill folder */
                 path: string;
+                body: string;
+            }[];
+        };
+        SkillRelease: {
+            version: number;
+            /** Format: date-time */
+            createdAt: string;
+            author: components["schemas"]["Ref"];
+            via: string;
+            /** Format: uuid */
+            improvementId: string | null;
+            /** @description Paths changed since the release before */
+            changed: string[];
+            files: {
+                /** @description Relative to the skill folder */
+                path: string;
+                version: number;
+            }[];
+        };
+        PublishSkillBody: {
+            files: {
+                /** @description Relative to the skill folder */
+                path: string;
+                body: string;
+                /** @description 0 to create */
+                baseVersion: number;
+            }[];
+            deleted?: string[];
+            /** @enum {string} */
+            mode: "publish" | "ask";
+            why?: string;
+        };
+        SkillReleaseDetail: {
+            version: number;
+            /** Format: date-time */
+            createdAt: string;
+            author: components["schemas"]["Ref"];
+            via: string;
+            /** Format: uuid */
+            improvementId: string | null;
+            /** @description Paths changed since the release before */
+            changed: string[];
+            files: {
+                /** @description Relative to the skill folder */
+                path: string;
+                version: number;
                 body: string;
             }[];
         };
@@ -853,8 +1782,19 @@ export interface components {
             externalRef?: string;
             /** Format: date-time */
             occurredAt?: string;
-            /** Format: binary */
+            /**
+             * Format: binary
+             * @description The text, at most SOURCE_MAX_BYTES bytes as UTF-8 (8,000,000 by default; 413 source_too_large over it)
+             */
             content: string;
+        };
+        SourceDetail: components["schemas"]["Source"] & {
+            externalRef: string | null;
+            /** Format: date-time */
+            occurredAt: string | null;
+            /** @description The first 2,000 characters, as stored */
+            excerpt: string;
+            truncated: boolean;
         };
         Me: {
             principal: {
@@ -864,6 +1804,8 @@ export interface components {
                 kind: "user" | "agent";
                 displayName: string;
                 email: string | null;
+                title?: string | null;
+                timezone?: string | null;
             };
             actsFor: {
                 /** Format: uuid */
@@ -883,6 +1825,10 @@ export interface components {
                 slug: string;
                 name: string;
                 role: string | null;
+                /** Format: uuid */
+                organizationId?: string;
+                /** @enum {string|null} */
+                orgRole?: "owner" | "admin" | "member" | null;
             }[];
             /** @description The organizations the principal belongs to */
             organizations: {
@@ -895,6 +1841,13 @@ export interface components {
         };
         SetCurrentWorkspaceBody: {
             workspace: string;
+        };
+        UpdateMeBody: {
+            displayName?: string;
+            /** @description null clears it */
+            title?: string | null;
+            /** @description An IANA zone name; null clears it */
+            timezone?: string | null;
         };
         Organization: {
             /** Format: uuid */
@@ -925,6 +1878,17 @@ export interface components {
             displayName: string;
             /** @enum {string} */
             role: "admin" | "editor" | "viewer";
+            /** @description false until the person first signs in */
+            joined?: boolean;
+            /** @enum {string|null} */
+            orgRole?: "owner" | "admin" | "member" | null;
+            title?: string | null;
+            timezone?: string | null;
+            /**
+             * Format: date-time
+             * @description Only with activity=true
+             */
+            lastActiveAt?: string | null;
         };
         AddMemberBody: {
             /** Format: email */
@@ -933,6 +1897,10 @@ export interface components {
             role: "admin" | "editor" | "viewer";
             displayName?: string;
         };
+        UpdateMemberBody: {
+            /** @enum {string} */
+            role: "admin" | "editor" | "viewer";
+        };
         Group: {
             /** Format: uuid */
             id: string;
@@ -940,6 +1908,9 @@ export interface components {
             memberCount: number;
         };
         CreateGroupBody: {
+            name: string;
+        };
+        UpdateGroupBody: {
             name: string;
         };
         AddGroupMemberBody: {
@@ -957,11 +1928,17 @@ export interface components {
                 id: string;
                 email: string;
             } | null;
+            description?: string | null;
         };
         CreateAgentBody: {
             name: string;
             /** Format: email */
             owner?: string;
+            description?: string;
+        };
+        UpdateAgentBody: {
+            /** @description null clears it */
+            description: string | null;
         };
         AgentKey: {
             /** Format: uuid */
@@ -977,6 +1954,13 @@ export interface components {
             revokedAt: string | null;
             /** Format: date-time */
             createdAt: string;
+            /**
+             * Format: date-time
+             * @description Set while the key is paused: it still reads and searches, and every write answers 403 key_paused
+             */
+            pausedAt: string | null;
+            /** @enum {string|null} */
+            pauseReason: "large_deletions" | null;
         };
         CreatedAgentKey: components["schemas"]["AgentKey"] & {
             /** @description ob_<keyId>_<secret>. Shown once, never stored. */
@@ -988,6 +1972,9 @@ export interface components {
             /** Format: date-time */
             expiresAt?: string;
         };
+        WorkspaceKey: components["schemas"]["AgentKey"] & {
+            agent: components["schemas"]["Ref"];
+        };
         Grant: {
             /** Format: uuid */
             id: string;
@@ -998,10 +1985,16 @@ export interface components {
                 /** Format: uuid */
                 id: string;
                 name: string;
+                displayName?: string;
+                /** @enum {string} */
+                kind?: "user" | "agent" | "group";
             };
             /** @enum {string} */
             role: "view" | "edit" | "manage";
             inheritedFrom: string | null;
+            /** Format: date-time */
+            createdAt?: string;
+            addedBy?: components["schemas"]["Ref"] | null;
         };
         PutGrantBody: {
             path: string;
@@ -1011,6 +2004,104 @@ export interface components {
             group?: string;
             /** @enum {string} */
             role: "view" | "edit" | "manage";
+        };
+        AccessExplanation: {
+            found: boolean;
+            path: string;
+            /** @enum {string} */
+            action: "read" | "write";
+            /** Format: uuid */
+            nodeId: string | null;
+            subject: {
+                /** Format: uuid */
+                id: string;
+                /** @enum {string} */
+                kind: "user" | "agent";
+                name: string;
+                actsAs: {
+                    /** Format: uuid */
+                    id: string;
+                    name: string;
+                } | null;
+                /** @enum {string|null} */
+                role: "admin" | "editor" | "viewer" | null;
+                member: boolean;
+                deleted: boolean;
+            };
+            /** @enum {string|null} */
+            level: "none" | "view" | "edit" | "manage" | null;
+            /** @enum {string|null} */
+            writePolicy: "review" | "direct" | null;
+            /** @enum {string} */
+            reason: "principal_deleted" | "not_member" | "node_deleted" | "private_owner" | "admin_role" | "grant" | "member_role" | "restricted_no_grant" | "private_space" | "not_found";
+            restrictedAt: string | null;
+            grants: {
+                /** Format: uuid */
+                grantId: string;
+                /** @enum {string} */
+                role: "view" | "edit" | "manage";
+                /** @enum {string} */
+                through: "direct" | "group";
+                path: string;
+                group: string | null;
+            }[];
+            why: string[];
+            need: {
+                text: string;
+                command: string | null;
+            } | null;
+            keys: {
+                keyId: string;
+                scopes: ("read" | "write" | "remember")[];
+                pathPrefix: string | null;
+                /** @enum {string} */
+                state: "active" | "expired" | "revoked" | "paused";
+                covers: boolean;
+            }[] | null;
+        };
+        Reader: {
+            principal: {
+                /** Format: uuid */
+                id: string;
+                name: string;
+                displayName: string;
+                /** @enum {string} */
+                kind: "user" | "agent" | "group";
+                email: string | null;
+            };
+            /**
+             * @description null unless the caller manages the path
+             * @enum {string|null}
+             */
+            level: "view" | "edit" | "manage" | null;
+            /** @description Why they can read it; null unless the caller manages the path */
+            reasons: string[] | null;
+        };
+        AccessEvent: {
+            /** Format: date-time */
+            at: string;
+            actor: components["schemas"]["Ref"];
+            action: string;
+            grantee: components["schemas"]["Ref"] | null;
+            /** @enum {string|null} */
+            level: "view" | "edit" | "manage" | null;
+        };
+        Reviewer: {
+            /** Format: uuid */
+            id: string;
+            principal: components["schemas"]["Ref"] | null;
+            group: components["schemas"]["Ref"] | null;
+            /** @description false: they lost edit on the folder and cannot accept until they have it again */
+            canWrite: boolean;
+            /** Format: date-time */
+            addedAt: string;
+        };
+        PutReviewerBody: {
+            path: string;
+            /** @description A member's email */
+            principal?: string;
+            /** @description A group's name */
+            group?: string;
         };
         AuditEvent: {
             seq: number;
@@ -1032,10 +2123,45 @@ export interface components {
             /** @enum {string} */
             status: "ok" | "broken";
             seq?: number;
+            /**
+             * @description When broken: chain, the hash chain breaks at seq; anchor, the event at seq is missing or differs from its daily anchor
+             * @enum {string}
+             */
+            reason?: "chain" | "anchor";
+            /** @description null when the server has no anchor file: only the chain was checked */
+            anchors: components["schemas"]["AuditAnchors"] | null;
+        };
+        AuditAnchors: {
+            /** @description Anchor lines compared, the newest 400 at most */
+            checked: number;
+            /** @description The highest anchored seq */
+            lastSeq: number | null;
+            /**
+             * Format: date-time
+             * @description When that seq was last anchored
+             */
+            lastAt: string | null;
+        };
+        WorkspaceDetail: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            organizationId: string;
+            name: string;
+            slug: string;
+            captureFolder: string | null;
+            region: string;
+            memberCount: number;
+            /**
+             * @description The caller's own role; null for a workspace-owned agent
+             * @enum {string|null}
+             */
+            role: "admin" | "editor" | "viewer" | null;
         };
         UpdateWorkspaceBody: {
             /** @description Where a captured session lands when it names no folder: a shared folder path, not under me/. It need not exist yet. null clears it. */
-            captureFolder: string | null;
+            captureFolder?: string | null;
+            name?: string;
         };
         EmbeddingSettings: {
             /** @enum {string} */
@@ -1058,6 +2184,267 @@ export interface components {
             model?: string;
             apiKey?: string | null;
         };
+        LoopSettings: {
+            enabled: boolean;
+            /** @enum {string} */
+            mode: "batch" | "direct";
+            /** @description A name from this server's list; null is the server's default chain */
+            endpoint: string | null;
+            /** @description Whether the workspace brought its own key. The key itself never comes back */
+            hasKey: boolean;
+            monthlyCapCents: number | null;
+            /** @enum {string|null} */
+            pausedReason: "cap" | "endpoint" | null;
+            /** @description The model endpoints this server's operator lists. Choosing one sends it the text of the sessions and files the loop reads, private ones included */
+            endpoints: {
+                name: string;
+                /** @enum {string} */
+                shape: "openai" | "anthropic";
+                model: string;
+                /** @enum {string} */
+                batch: "openai" | "anthropic" | "none";
+                hasServerKey: boolean;
+            }[];
+            defaultChain: string[];
+        };
+        LoopSettingsInput: {
+            enabled?: boolean;
+            /** @enum {string} */
+            mode?: "batch" | "direct";
+            endpoint?: string | null;
+            /** @description Write only. A string sets it, null clears it, absent keeps it for the same endpoint only */
+            key?: string | null;
+            monthlyCapCents?: number;
+        };
+        LoopStatus: {
+            enabled: boolean;
+            /** @enum {string|null} */
+            paused: "cap" | "endpoint" | null;
+            sourcesWaiting: number;
+            memoriesThisMonth: number;
+            proposals: {
+                pending: number;
+                applied: number;
+            };
+            usage: {
+                calls: number;
+                charsRead: number;
+                /** @description charsRead / 3000, rounded up */
+                pagesRead: number;
+                inputTokens: number;
+                cachedTokens: number;
+                outputTokens: number;
+                costCents: number;
+                /** @description What the batches still at the provider may cost, rounded up: counted against the cap until they close */
+                inFlightCents: number;
+            };
+            monthlyCapCents: number | null;
+            lastRun: {
+                /** Format: date-time */
+                at: string;
+                /** @enum {string} */
+                kind: "first_pass" | "old_sources";
+                queued: number;
+            } | null;
+        };
+        LoopRunReport: {
+            /** @enum {boolean} */
+            started: true;
+        };
+        RunLoopBody: {
+            /**
+             * Format: date
+             * @description YYYY-MM-DD. With it, the sources created since then are queued; without it, the first pass runs
+             */
+            sourcesSince?: string;
+        };
+        LoopLock: {
+            path: string;
+            /** Format: uuid */
+            nodeId: string;
+            /** Format: date-time */
+            lockedAt: string;
+        };
+        LoopLockBody: {
+            /** @description A file or a folder. Everything under a folder is locked with it */
+            path: string;
+        };
+        LoopOverview: {
+            enabled: boolean;
+            /** @enum {string|null} */
+            paused: "cap" | "endpoint" | null;
+            pendingImprovements: number;
+            acceptedThisWeek: number;
+            memoriesThisWeek: number;
+            /** Format: date-time */
+            lastRunAt: string | null;
+        };
+        LoopDay: {
+            /** @description YYYY-MM-DD */
+            date: string;
+            sourcesRead: number;
+            memories: number;
+            proposed: number;
+            accepted: number;
+            dismissed: number;
+        };
+        LoopLockEntry: {
+            path: string;
+            /** Format: date-time */
+            lockedAt: string;
+            lockedBy: components["schemas"]["Ref"];
+        };
+        LoopUsageDay: {
+            /** @description YYYY-MM-DD, a UTC day */
+            date: string;
+            jobKind: string;
+            pagesRead: number;
+            costCents: number;
+        };
+        AnalyticsOverview: {
+            /**
+             * Format: date
+             * @description The first UTC day of the window
+             */
+            from: string;
+            /**
+             * Format: date
+             * @description The last UTC day of the window, inclusive
+             */
+            to: string;
+            totals: {
+                searches: number;
+                /** @description Searches that found nothing */
+                emptySearches: number;
+                fileReads: number;
+                skillReads: number;
+                memoriesSaved: number;
+                accepted: number;
+                dismissed: number;
+                activePeople: number;
+            };
+            byDay: {
+                /** Format: date */
+                day: string;
+                searches: number;
+                fileReads: number;
+                skillReads: number;
+                memoriesSaved: number;
+            }[];
+            byChannel: {
+                /** @enum {string} */
+                via: "rest" | "mcp" | "cli" | "unknown";
+                searches: number;
+                fileReads: number;
+                skillReads: number;
+            }[];
+            /** @description Improvements proposed and decided in the window */
+            loop: {
+                proposed: number;
+                accepted: number;
+                dismissed: number;
+            };
+            /** @description false while older activity is still being counted: the numbers can still grow */
+            complete: boolean;
+        };
+        FileActivityRow: {
+            node: {
+                /** Format: uuid */
+                id: string;
+                path: string;
+                name: string;
+            };
+            reads: number;
+            /** @description How many different people and agents read it */
+            readers: number;
+            /** Format: date-time */
+            lastReadAt: string;
+        };
+        FileActivity: {
+            reads: number;
+            readers: number;
+            /** Format: date-time */
+            lastReadAt: string | null;
+            byDay: {
+                /** Format: date */
+                day: string;
+                reads: number;
+            }[];
+            /** @description Who read it, most reads first. null unless the caller is a workspace admin */
+            people: {
+                person: components["schemas"]["Ref"];
+                reads: number;
+                /** Format: date-time */
+                lastReadAt: string;
+            }[] | null;
+        };
+        ReviewStats: {
+            /** @description Files the caller can read, at or under the folder */
+            files: number;
+            /** @description Their review date is before today */
+            pastDue: number;
+            /** @description Their review date is within 14 days */
+            dueSoon: number;
+            noDate: number;
+            /** @description Marked reviewed in the last 30 days */
+            reviewed30: number;
+        };
+        PersonActivity: {
+            person: components["schemas"]["Ref"];
+            /** @enum {string} */
+            kind: "user" | "agent";
+            searches: number;
+            fileReads: number;
+            skillReads: number;
+            memoriesSaved: number;
+            /** @description Improvements this person accepted */
+            accepted: number;
+            /** Format: date-time */
+            lastActiveAt: string | null;
+        };
+        SkillActivityRow: {
+            name: string;
+            path: string;
+            reads: number;
+            readers: number;
+            /** Format: date-time */
+            lastReadAt: string;
+        };
+        SkillActivity: {
+            reads: number;
+            readers: number;
+            byDay: {
+                /** Format: date */
+                day: string;
+                rest: number;
+                mcp: number;
+                cli: number;
+                unknown: number;
+            }[];
+            /** @description Who read it, most reads first. null unless the caller is a workspace admin */
+            people: {
+                person: components["schemas"]["Ref"];
+                reads: number;
+                /** Format: date-time */
+                lastReadAt: string;
+            }[] | null;
+        };
+        CaptureConfig: {
+            /** @description The folder a session this caller sends with no folder lands in; null: it stays private to the caller */
+            captureFolder: string | null;
+            /** @description The largest session or upload this server stores, in UTF-8 bytes (SOURCE_MAX_BYTES) */
+            sourceMaxBytes: number;
+            /** @description Whether this server hands out transcription tokens (DEEPGRAM_API_KEY is set) */
+            transcription: boolean;
+        };
+        TranscriptionToken: {
+            /** @description Deepgram's short-lived token: Authorization: Bearer <token> */
+            token: string;
+            /** Format: date-time */
+            expiresAt: string;
+            /** @description Deepgram's prerecorded listen address with this server's query parameters */
+            listenUrl: string;
+        };
     };
     responses: never;
     parameters: never;
@@ -1071,6 +2458,18 @@ export interface operations {
         parameters: {
             query?: {
                 path?: string;
+                recursive?: boolean;
+                kind?: "file" | "folder";
+                counts?: boolean;
+                sort?: "name" | "updated";
+                limit?: number;
+                cursor?: string;
+                /** @description One tag or a comma list: nodes that carry all of them */
+                tag?: string;
+                /** @description One label or a comma list: nodes with any of them */
+                sensitivity?: string;
+                /** @description Files only. due: the review date is before today. soon: within 14 days. none: no date */
+                review?: "due" | "soon" | "none";
             };
             header?: never;
             path: {
@@ -1090,6 +2489,7 @@ export interface operations {
                     "application/json": {
                         node: components["schemas"]["Node"] | null;
                         children: components["schemas"]["Node"][];
+                        nextCursor?: string | null;
                     };
                 };
             };
@@ -1132,6 +2532,17 @@ export interface operations {
             /** @description The workspace key is revoked */
             423: {
                 headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
                     [name: string]: unknown;
                 };
                 content: {
@@ -1211,6 +2622,28 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            /** @description The key is over its limit of writes or searches a minute (too_many_requests; error.kind, error.limit, error.retryAfterSeconds); try again after Retry-After */
+            429: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
         };
     };
     updateFolder: {
@@ -1278,6 +2711,28 @@ export interface operations {
             /** @description The workspace key is revoked */
             423: {
                 headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The key is over its limit of writes or searches a minute (too_many_requests; error.kind, error.limit, error.retryAfterSeconds); try again after Retry-After */
+            429: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
                     [name: string]: unknown;
                 };
                 content: {
@@ -1352,6 +2807,852 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            /** @description The key is over its limit of writes or searches a minute (too_many_requests; error.kind, error.limit, error.retryAfterSeconds); try again after Retry-After */
+            429: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    moveNode: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+            };
+            cookie?: never;
+        };
+        /** @description The node and its new path */
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MoveNodeBody"];
+            };
+        };
+        responses: {
+            /** @description The node at its new path, and how many nodes moved with it */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        node: components["schemas"]["Node"];
+                        moved: number;
+                    };
+                };
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The target exists, or the move is too large to do in one request (conflict) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The key is over its limit of writes or searches a minute (too_many_requests; error.kind, error.limit, error.retryAfterSeconds); try again after Retry-After */
+            429: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    listDeleted: {
+        parameters: {
+            query?: {
+                /** @description A folder path: what was deleted at or under it */
+                under?: string;
+                limit?: number;
+                cursor?: string;
+            };
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The deleted nodes, newest delete first */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["DeletedNode"][];
+                        nextCursor: string | null;
+                    };
+                };
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    restoreNode: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+            };
+            cookie?: never;
+        };
+        /** @description The deleted node to bring back */
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RestoreNodeBody"];
+            };
+        };
+        responses: {
+            /** @description The node at its path again, and how many nodes came back with it */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        node: components["schemas"]["Node"];
+                        restored: number;
+                    };
+                };
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description A live node holds the path (conflict; error.reason path_taken), a live skill holds the name (conflict; error.reason name_taken), or a SKILL.md cannot come back as it was: its folder was renamed after the delete, or is inside another skill now (conflict, no reason). Nothing is renamed and nothing comes back */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The key is over its limit of writes or searches a minute (too_many_requests; error.kind, error.limit, error.retryAfterSeconds); try again after Retry-After */
+            429: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    listTags: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The tags on nodes the caller can read, most used first, at most 500 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            tag: string;
+                            count: number;
+                        }[];
+                    };
+                };
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getNodeMeta: {
+        parameters: {
+            query: {
+                path: string;
+            };
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The node's tags, label, description and review dates */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NodeMetaDetail"];
+                };
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    updateNodeMeta: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+            };
+            cookie?: never;
+        };
+        /** @description The node and the fields to change */
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateNodeMetaBody"];
+            };
+        };
+        responses: {
+            /** @description The node as it is now */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NodeMetaDetail"];
+                };
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The key is over its limit of writes or searches a minute (too_many_requests; error.kind, error.limit, error.retryAfterSeconds); try again after Retry-After */
+            429: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    markReviewed: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+            };
+            cookie?: never;
+        };
+        /** @description The node */
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MarkReviewedBody"];
+            };
+        };
+        responses: {
+            /** @description The node as it is now */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NodeMetaDetail"];
+                };
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The key is over its limit of writes or searches a minute (too_many_requests; error.kind, error.limit, error.retryAfterSeconds); try again after Retry-After */
+            429: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getGraph: {
+        parameters: {
+            query?: {
+                /** @description The folder the picture starts at. The root when left out */
+                folder?: string;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The nodes and the edges */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Graph"];
+                };
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    listGraphMemories: {
+        parameters: {
+            query: {
+                /** @description A node's id, from GET graph */
+                node: string;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The memories, best score first */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Memory"][];
+                    };
+                };
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
         };
     };
     getFile: {
@@ -1417,6 +3718,17 @@ export interface operations {
             /** @description The workspace key is revoked */
             423: {
                 headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
                     [name: string]: unknown;
                 };
                 content: {
@@ -1507,9 +3819,40 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            /** @description The file is over the largest this server stores (file_too_large; error.sizeBytes, error.maxBytes), or the request body is over 16 MB (payload_too_large) */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
             /** @description The workspace key is revoked */
             423: {
                 headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The key is over its limit of writes or searches a minute (too_many_requests; error.kind, error.limit, error.retryAfterSeconds); try again after Retry-After */
+            429: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
                     [name: string]: unknown;
                 };
                 content: {
@@ -1588,6 +3931,17 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
         };
     };
     restoreFile: {
@@ -1652,7 +4006,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description Stale baseVersion; error.currentVersion has the current one */
+            /** @description The file changed while it was being restored (error.currentVersion has the current one), or the version is a board save that was not kept (no currentVersion) */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -1664,6 +4018,325 @@ export interface operations {
             /** @description The workspace key is revoked */
             423: {
                 headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The key is over its limit of writes or searches a minute (too_many_requests; error.kind, error.limit, error.retryAfterSeconds); try again after Retry-After */
+            429: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getOriginal: {
+        parameters: {
+            query: {
+                path: string;
+                version?: number;
+            };
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The bytes as uploaded, as an attachment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/octet-stream": string;
+                };
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The key is over its limit of writes or searches a minute (too_many_requests; error.kind, error.limit, error.retryAfterSeconds); try again after Retry-After */
+            429: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    putOriginal: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+            };
+            cookie?: never;
+        };
+        /** @description The path, the version the upload was based on, the text and the bytes */
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["PutOriginalBody"];
+            };
+        };
+        responses: {
+            /** @description The file at its new version, with its original */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["File"];
+                };
+            };
+            /** @description The request is not valid, or the bytes are refused (invalid_request; error.reason unsupported_type, type_mismatch, macro or in_skill) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Stale baseVersion; error.currentVersion has the current one */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The bytes are over the largest original, the workspace's originals are full, or the server's disk is near full (file_too_large; error.limit, error.reason original, quota or storage_full); the text is over the largest file (file_too_large; error.sizeBytes, error.maxBytes); or the request body is over 16 MB (payload_too_large) */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The key is over its limit of writes or searches a minute (too_many_requests; error.kind, error.limit, error.retryAfterSeconds); try again after Retry-After */
+            429: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    listMemories: {
+        parameters: {
+            query?: {
+                /** @description One status or a comma list */
+                status?: string;
+                folder?: string;
+                /** @description A principal id: the memories that principal wrote */
+                author?: string;
+                kind?: "fact" | "decision" | "preference" | "procedure" | "correction";
+                limit?: number;
+                cursor?: string;
+            };
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The memories the caller may read, newest first */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Memory"][];
+                        nextCursor: string | null;
+                    };
+                };
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
                     [name: string]: unknown;
                 };
                 content: {
@@ -1752,6 +4425,28 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            /** @description The key is over its limit of writes or searches a minute (too_many_requests; error.kind, error.limit, error.retryAfterSeconds); try again after Retry-After */
+            429: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
         };
     };
     getMemory: {
@@ -1815,6 +4510,17 @@ export interface operations {
             /** @description The workspace key is revoked */
             423: {
                 headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
                     [name: string]: unknown;
                 };
                 content: {
@@ -1898,6 +4604,215 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            /** @description The key is over its limit of writes or searches a minute (too_many_requests; error.kind, error.limit, error.retryAfterSeconds); try again after Retry-After */
+            429: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    acceptMemory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The accepted memory */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Memory"];
+                };
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The key is over its limit of writes or searches a minute (too_many_requests; error.kind, error.limit, error.retryAfterSeconds); try again after Retry-After */
+            429: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    rejectMemory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        /** @description Optionally, why */
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RejectMemoryBody"];
+            };
+        };
+        responses: {
+            /** @description The rejected memory */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Memory"];
+                };
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The key is over its limit of writes or searches a minute (too_many_requests; error.kind, error.limit, error.retryAfterSeconds); try again after Retry-After */
+            429: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
         };
     };
     search: {
@@ -1975,12 +4890,39 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            /** @description The key is over its limit of writes or searches a minute (too_many_requests; error.kind, error.limit, error.retryAfterSeconds); try again after Retry-After */
+            429: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
         };
     };
     listImprovements: {
         parameters: {
             query?: {
-                status?: "pending" | "accepted" | "dismissed" | "superseded";
+                /** @description One status, a comma list, or all. Default pending */
+                status?: string;
+                path?: string;
+                folder?: string;
+                limit?: number;
+                cursor?: string;
             };
             header?: never;
             path: {
@@ -1999,6 +4941,7 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: components["schemas"]["Improvement"][];
+                        nextCursor?: string | null;
                     };
                 };
             };
@@ -2041,6 +4984,17 @@ export interface operations {
             /** @description The workspace key is revoked */
             423: {
                 headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
                     [name: string]: unknown;
                 };
                 content: {
@@ -2116,6 +5070,17 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
         };
     };
     acceptImprovement: {
@@ -2136,7 +5101,7 @@ export interface operations {
             };
         };
         responses: {
-            /** @description The accepted improvement and the file at its new version */
+            /** @description The improvement and the file at its new version. file is null when accepting a private proposal only shared it for review */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -2144,7 +5109,7 @@ export interface operations {
                 content: {
                     "application/json": {
                         improvement: components["schemas"]["Improvement"];
-                        file: components["schemas"]["File"];
+                        file: components["schemas"]["File"] | null;
                     };
                 };
             };
@@ -2166,7 +5131,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description The caller may not do this */
+            /** @description The caller may not accept it (forbidden): error.reason own_proposal when they asked for this review, not_reviewer when the folder has reviewers and they are not one */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -2184,8 +5149,17 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description Stale baseVersion; error.currentVersion has the current one */
+            /** @description The file changed after the proposal (conflict; error.currentVersion has its version), the improvement was decided while this ran (conflict), or a memory it rests on was corrected or forgotten (outdated) or is hidden from a reader of the file (evidence_restricted) */
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The file is over the largest this server stores (file_too_large; error.sizeBytes, error.maxBytes), or the request body is over 16 MB (payload_too_large) */
+            413: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -2196,6 +5170,28 @@ export interface operations {
             /** @description The workspace key is revoked */
             423: {
                 headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The key is over its limit of writes or searches a minute (too_many_requests; error.kind, error.limit, error.retryAfterSeconds); try again after Retry-After */
+            429: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
                     [name: string]: unknown;
                 };
                 content: {
@@ -2249,7 +5245,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
-            /** @description The caller may not do this */
+            /** @description The caller may not dismiss it (forbidden): error.reason not_reviewer when the folder has reviewers and they are neither one, an admin, nor the person who asked */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -2267,9 +5263,40 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            /** @description The improvement was decided while this ran (conflict) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
             /** @description The workspace key is revoked */
             423: {
                 headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The key is over its limit of writes or searches a minute (too_many_requests; error.kind, error.limit, error.retryAfterSeconds); try again after Retry-After */
+            429: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
                     [name: string]: unknown;
                 };
                 content: {
@@ -2346,6 +5373,17 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
         };
     };
     getSkill: {
@@ -2415,6 +5453,17 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
         };
     };
     exportSkill: {
@@ -2478,6 +5527,499 @@ export interface operations {
             /** @description The workspace key is revoked */
             423: {
                 headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    publishSkill: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+                name: string;
+            };
+            cookie?: never;
+        };
+        /** @description Every changed file of the skill, written as one release */
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PublishSkillBody"];
+            };
+        };
+        responses: {
+            /** @description The skill and its new release */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        skill: components["schemas"]["SkillDetail"];
+                        release: components["schemas"]["SkillRelease"];
+                    };
+                };
+            };
+            /** @description mode ask: one pending improvement per changed file */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        improvements: components["schemas"]["Improvement"][];
+                    };
+                };
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Stale baseVersion; error.currentVersion has the current one */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The file is over the largest this server stores (file_too_large; error.sizeBytes, error.maxBytes), or the request body is over 16 MB (payload_too_large) */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The key is over its limit of writes or searches a minute (too_many_requests; error.kind, error.limit, error.retryAfterSeconds); try again after Retry-After */
+            429: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    listSkillReleases: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+                name: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Every release, newest first */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["SkillRelease"][];
+                    };
+                };
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getSkillRelease: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+                name: string;
+                version: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The release with its files */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SkillReleaseDetail"];
+                };
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    restoreSkillRelease: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+                name: string;
+                version: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The skill and the new release that brings the old one back */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        skill: components["schemas"]["SkillDetail"];
+                        release: components["schemas"]["SkillRelease"];
+                    };
+                };
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The skill changed while it was restored (conflict); try again */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The key is over its limit of writes or searches a minute (too_many_requests; error.kind, error.limit, error.retryAfterSeconds); try again after Retry-After */
+            429: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    listSources: {
+        parameters: {
+            query?: {
+                folder?: string;
+                kind?: "agent_save" | "session" | "upload" | "import";
+                limit?: number;
+                cursor?: string;
+            };
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The sources the caller may read, newest first, without their text */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Source"][];
+                        nextCursor: string | null;
+                    };
+                };
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
                     [name: string]: unknown;
                 };
                 content: {
@@ -2557,9 +6099,209 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            /** @description The source is over the largest this server stores (source_too_large; error.sizeBytes, error.maxBytes), or the request body is over 16 MB (payload_too_large) */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
             /** @description The workspace key is revoked */
             423: {
                 headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The key is over its limit of writes or searches a minute (too_many_requests; error.kind, error.limit, error.retryAfterSeconds); try again after Retry-After */
+            429: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getSource: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The source and an excerpt */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SourceDetail"];
+                };
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    deleteSource: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted, with every quote taken from it */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The key is over its limit of writes or searches a minute (too_many_requests; error.kind, error.limit, error.retryAfterSeconds); try again after Retry-After */
+            429: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
                     [name: string]: unknown;
                 };
                 content: {
@@ -2625,6 +6367,98 @@ export interface operations {
             /** @description The workspace key is revoked */
             423: {
                 headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    updateMe: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description What to change of the caller */
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateMeBody"];
+            };
+        };
+        responses: {
+            /** @description The caller, as changed */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Me"];
+                };
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
                     [name: string]: unknown;
                 };
                 content: {
@@ -2701,6 +6535,17 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
         };
     };
     createOrganization: {
@@ -2765,6 +6610,17 @@ export interface operations {
             /** @description The workspace key is revoked */
             423: {
                 headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
                     [name: string]: unknown;
                 };
                 content: {
@@ -2843,11 +6699,24 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
         };
     };
     listMembers: {
         parameters: {
-            query?: never;
+            query?: {
+                activity?: boolean;
+            };
             header?: never;
             path: {
                 /** @description The workspace slug */
@@ -2907,6 +6776,17 @@ export interface operations {
             /** @description The workspace key is revoked */
             423: {
                 headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
                     [name: string]: unknown;
                 };
                 content: {
@@ -2986,6 +6866,17 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
         };
     };
     removeMember: {
@@ -3047,6 +6938,197 @@ export interface operations {
             /** @description The workspace key is revoked */
             423: {
                 headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    updateMember: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+                principalId: string;
+            };
+            cookie?: never;
+        };
+        /** @description The new role */
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateMemberBody"];
+            };
+        };
+        responses: {
+            /** @description The member with the new role */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Member"];
+                };
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The last admin keeps the role (conflict) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    leaveWorkspace: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The caller is no longer a member */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The last admin cannot leave (conflict) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
                     [name: string]: unknown;
                 };
                 content: {
@@ -3117,6 +7199,17 @@ export interface operations {
             /** @description The workspace key is revoked */
             423: {
                 headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
                     [name: string]: unknown;
                 };
                 content: {
@@ -3196,6 +7289,17 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
         };
     };
     deleteGroup: {
@@ -3257,6 +7361,111 @@ export interface operations {
             /** @description The workspace key is revoked */
             423: {
                 headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    updateGroup: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        /** @description The new name */
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateGroupBody"];
+            };
+        };
+        responses: {
+            /** @description The group with the new name */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Group"];
+                };
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Another group of the workspace has that name (conflict) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
                     [name: string]: unknown;
                 };
                 content: {
@@ -3328,6 +7537,17 @@ export interface operations {
             /** @description The workspace key is revoked */
             423: {
                 headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
                     [name: string]: unknown;
                 };
                 content: {
@@ -3408,6 +7628,17 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
         };
     };
     removeGroupMember: {
@@ -3470,6 +7701,17 @@ export interface operations {
             /** @description The workspace key is revoked */
             423: {
                 headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
                     [name: string]: unknown;
                 };
                 content: {
@@ -3540,6 +7782,17 @@ export interface operations {
             /** @description The workspace key is revoked */
             423: {
                 headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
                     [name: string]: unknown;
                 };
                 content: {
@@ -3619,6 +7872,17 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
         };
     };
     deleteAgent: {
@@ -3680,6 +7944,102 @@ export interface operations {
             /** @description The workspace key is revoked */
             423: {
                 headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    updateAgent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        /** @description The new description */
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateAgentBody"];
+            };
+        };
+        responses: {
+            /** @description The agent as changed */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Agent"];
+                };
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
                     [name: string]: unknown;
                 };
                 content: {
@@ -3751,6 +8111,17 @@ export interface operations {
             /** @description The workspace key is revoked */
             423: {
                 headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
                     [name: string]: unknown;
                 };
                 content: {
@@ -3831,6 +8202,17 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
         };
     };
     revokeKey: {
@@ -3900,12 +8282,190 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    resumeKey: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+                id: string;
+                /** @description The key's public id */
+                keyId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The key, no longer paused */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgentKey"];
+                };
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    listAllKeys: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Every key the caller may see, each with its agent */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["WorkspaceKey"][];
+                    };
+                };
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
         };
     };
     listGrants: {
         parameters: {
-            query: {
-                path: string;
+            query?: {
+                path?: string;
+                /** @description A member's email or an agent's name */
+                principal?: string;
+                /** @description A group's name */
+                group?: string;
             };
             header?: never;
             path: {
@@ -3916,7 +8476,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description The grants on the path and above it */
+            /** @description The grants on the path and above it, or the grants to one principal or group */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -3966,6 +8526,17 @@ export interface operations {
             /** @description The workspace key is revoked */
             423: {
                 headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
                     [name: string]: unknown;
                 };
                 content: {
@@ -4045,6 +8616,17 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
         };
     };
     deleteGrant: {
@@ -4117,12 +8699,545 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    explainAccess: {
+        parameters: {
+            query: {
+                who?: string;
+                path: string;
+                for?: "read" | "write";
+            };
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The rule that decided, and what would change it */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccessExplanation"];
+                };
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    listReaders: {
+        parameters: {
+            query: {
+                path: string;
+            };
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Who can read the path. Level and reasons only for a caller who manages it */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        count: number;
+                        data: components["schemas"]["Reader"][];
+                    };
+                };
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    listAccessHistory: {
+        parameters: {
+            query: {
+                path: string;
+                limit?: number;
+                cursor?: string;
+            };
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Who gave and took access on the path, newest first */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["AccessEvent"][];
+                        nextCursor: string | null;
+                    };
+                };
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    listReviewers: {
+        parameters: {
+            query: {
+                path: string;
+            };
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The reviewers that count for the path: those of the nearest folder at or above it that has any. inheritedFrom is that folder when it is not the path itself */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Reviewer"][];
+                        inheritedFrom: string | null;
+                    };
+                };
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    putReviewer: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+            };
+            cookie?: never;
+        };
+        /** @description The folder, and a person or a group */
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PutReviewerBody"];
+            };
+        };
+        responses: {
+            /** @description The reviewer */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Reviewer"];
+                };
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description That person or group cannot write in the folder, so they could not accept (conflict; error.reason cannot_write) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    deleteReviewer: {
+        parameters: {
+            query: {
+                /** @description A reviewer entry's id, from GET reviewers */
+                id: string;
+            };
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Removed */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
         };
     };
     listAudit: {
         parameters: {
             query?: {
                 action?: string;
+                /** @description A principal id: who acted */
+                actor?: string;
+                /** @description file, node, grant, workspace and so on */
+                resourceKind?: string;
+                /** @description The id of the thing acted on */
+                resourceId?: string;
+                /** @description ok or denied */
+                outcome?: string;
+                /** @description An ISO 8601 time: events at or after it */
+                since?: string;
+                /** @description An ISO 8601 time: events before it */
+                until?: string;
                 limit?: number;
                 cursor?: string;
             };
@@ -4192,6 +9307,17 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
         };
     };
     verifyAudit: {
@@ -4206,7 +9332,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description ok, or broken with the sequence number of the break */
+            /** @description ok, or broken with the sequence number of the break and its reason; anchors says what the daily anchors covered */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -4254,6 +9380,26 @@ export interface operations {
             /** @description The workspace key is revoked */
             423: {
                 headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The anchor file could not be read, or holds a line that is not an anchor */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
                     [name: string]: unknown;
                 };
                 content: {
@@ -4325,6 +9471,17 @@ export interface operations {
             /** @description The workspace key is revoked */
             423: {
                 headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
                     [name: string]: unknown;
                 };
                 content: {
@@ -4410,6 +9567,96 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getWorkspace: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The workspace and the caller's role in it */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WorkspaceDetail"];
+                };
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
         };
     };
     deleteWorkspace: {
@@ -4470,6 +9717,17 @@ export interface operations {
             /** @description The workspace key is revoked */
             423: {
                 headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
                     [name: string]: unknown;
                 };
                 content: {
@@ -4549,6 +9807,17 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
         };
     };
     getEmbeddingSettings: {
@@ -4611,6 +9880,17 @@ export interface operations {
             /** @description The workspace key is revoked */
             423: {
                 headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
                     [name: string]: unknown;
                 };
                 content: {
@@ -4684,6 +9964,1668 @@ export interface operations {
             /** @description The workspace key is revoked */
             423: {
                 headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getLoopSettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The loop's settings, never its key */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LoopSettings"];
+                };
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    putLoopSettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+            };
+            cookie?: never;
+        };
+        /** @description What to change; switching the loop on needs a monthly cap */
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LoopSettingsInput"];
+            };
+        };
+        responses: {
+            /** @description The settings as saved */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LoopSettings"];
+                };
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getLoopStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description What the loop did this month, and why it waits */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LoopStatus"];
+                };
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    runLoop: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+            };
+            cookie?: never;
+        };
+        /** @description Optionally, the date to read old sources from */
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RunLoopBody"];
+            };
+        };
+        responses: {
+            /** @description The run was queued; GET loop/status says what it did */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LoopRunReport"];
+                };
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    listLoopLocks: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Every path the loop keeps away from */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["LoopLockEntry"][];
+                    };
+                };
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    lockForLoop: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+            };
+            cookie?: never;
+        };
+        /** @description The file or folder the loop keeps away from: no targets, no drafts, and its pending proposals there superseded */
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LoopLockBody"];
+            };
+        };
+        responses: {
+            /** @description The lock, new or as it was */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LoopLock"];
+                };
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    unlockForLoop: {
+        parameters: {
+            query: {
+                path: string;
+            };
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Unlocked */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getLoopOverview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description What the loop is doing, counted over what the caller can read */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LoopOverview"];
+                };
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getLoopActivity: {
+        parameters: {
+            query?: {
+                /** @description A whole number from 1 to 90 */
+                days?: number;
+                /** @description An IANA zone name; UTC when left out */
+                tz?: string;
+            };
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description One entry per day, oldest first */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["LoopDay"][];
+                    };
+                };
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getLoopUsage: {
+        parameters: {
+            query?: {
+                /** @description A whole number from 1 to 90 */
+                days?: number;
+            };
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Pages read and cost per day and job kind */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["LoopUsageDay"][];
+                    };
+                };
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getAnalyticsOverview: {
+        parameters: {
+            query?: {
+                /** @description The window: that many UTC days, ending today. 30 when left out */
+                days?: 7 | 30 | 90;
+            };
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The totals, by day and by channel */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnalyticsOverview"];
+                };
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The key is over its limit of writes or searches a minute (too_many_requests; error.kind, error.limit, error.retryAfterSeconds); try again after Retry-After */
+            429: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    listFileActivity: {
+        parameters: {
+            query?: {
+                /** @description The window: that many UTC days, ending today. 30 when left out */
+                days?: 7 | 30 | 90;
+                /** @description Only files at or under this folder */
+                folder?: string;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The files, most read first */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["FileActivityRow"][];
+                    };
+                };
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The key is over its limit of writes or searches a minute (too_many_requests; error.kind, error.limit, error.retryAfterSeconds); try again after Retry-After */
+            429: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getFileActivity: {
+        parameters: {
+            query: {
+                path: string;
+                /** @description The window: that many UTC days, ending today. 30 when left out */
+                days?: 7 | 30 | 90;
+            };
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The file's reads */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FileActivity"];
+                };
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The key is over its limit of writes or searches a minute (too_many_requests; error.kind, error.limit, error.retryAfterSeconds); try again after Retry-After */
+            429: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getReviewStats: {
+        parameters: {
+            query?: {
+                /** @description Only files at or under this folder */
+                folder?: string;
+            };
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The counts */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReviewStats"];
+                };
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The key is over its limit of writes or searches a minute (too_many_requests; error.kind, error.limit, error.retryAfterSeconds); try again after Retry-After */
+            429: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    listPeopleActivity: {
+        parameters: {
+            query?: {
+                /** @description The window: that many UTC days, ending today. 30 when left out */
+                days?: 7 | 30 | 90;
+            };
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The rows, most active first */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["PersonActivity"][];
+                    };
+                };
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The key is over its limit of writes or searches a minute (too_many_requests; error.kind, error.limit, error.retryAfterSeconds); try again after Retry-After */
+            429: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    listSkillActivity: {
+        parameters: {
+            query?: {
+                /** @description The window: that many UTC days, ending today. 30 when left out */
+                days?: 7 | 30 | 90;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The skills, most read first */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["SkillActivityRow"][];
+                    };
+                };
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The key is over its limit of writes or searches a minute (too_many_requests; error.kind, error.limit, error.retryAfterSeconds); try again after Retry-After */
+            429: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getSkillActivity: {
+        parameters: {
+            query?: {
+                /** @description The window: that many UTC days, ending today. 30 when left out */
+                days?: 7 | 30 | 90;
+            };
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+                name: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The skill's reads */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SkillActivity"];
+                };
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The key is over its limit of writes or searches a minute (too_many_requests; error.kind, error.limit, error.retryAfterSeconds); try again after Retry-After */
+            429: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getCaptureConfig: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Where a session from this caller lands, the largest source, and whether transcription is set up */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CaptureConfig"];
+                };
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    createTranscriptionToken: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The workspace slug */
+                workspace: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A Deepgram token for one transcription */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TranscriptionToken"];
+                };
+            };
+            /** @description The request is not valid */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Missing or bad token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The caller may not do this */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Not found, or not visible to the caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The workspace key is revoked */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The key is over its limit of writes or searches a minute (too_many_requests; error.kind, error.limit, error.retryAfterSeconds); try again after Retry-After */
+            429: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description The database was busy with another change (busy); send the request again after Retry-After */
+            503: {
+                headers: {
+                    /** @description Seconds to wait */
+                    "Retry-After": string;
                     [name: string]: unknown;
                 };
                 content: {

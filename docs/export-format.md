@@ -65,6 +65,7 @@ One JSON object per line, each line ending in a newline; the file is empty when 
 | `folder` | string or null | The path of the folder it belongs to; null when it has no folder |
 | `visibility` | `workspace` or `private` | The visibility of its folder; `private` when it has no folder |
 | `status` | string | `unreviewed`, `accepted`, `rejected` or `retired` |
+| `kind` | string or null | What the learning loop took it to be: `fact`, `decision`, `preference`, `procedure` or `correction`; null for a memory a person or an agent saved |
 | `validFrom` | string | When it became true |
 | `validTo` | string or null | When it stopped being true; null while it still holds |
 | `supersedesId` | string or null | The id of the memory this one replaces |
@@ -112,6 +113,7 @@ One Brain removes secrets and personal data before it stores anything, so the ex
 - Search data (word stems and embeddings). It is derived from the content and rebuilt from it.
 - Skill releases (which file versions made up each release of a skill). Each skill file's current version is under `files/`.
 - Who wrote a file or a memory, which source a memory came from, an improvement's citations, and who proposed or decided it.
+- A memory's evidence: the passages of sessions and uploads the learning loop quoted when it drew the memory from them. The sources themselves are in `sources.jsonl`.
 
 ## Reading an export without One Brain
 

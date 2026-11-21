@@ -7,7 +7,7 @@ import read from '../src/commands/read.ts';
 import remember from '../src/commands/remember.ts';
 import search from '../src/commands/search.ts';
 import write from '../src/commands/write.ts';
-import { fakeApi, testIo } from './helpers.ts';
+import { type FakeCall, type FakeReply, fakeApi, testIo } from './helpers.ts';
 
 const W = '/v1/workspaces/kenso';
 const ID = '3f1c2a9e-0000-4000-8000-000000000001';
@@ -310,6 +310,7 @@ describe('capture', () => {
     const content = form?.get('content') as Blob;
     expect(await content.text()).toBe('{"type":"user"}\n');
     expect(t.stdout()).toBe('s1\n');
+    expect(calls).toHaveLength(1);
   });
 
   it('sends visibility private with --private, and refuses it together with --folder', async () => {
@@ -332,5 +333,202 @@ describe('capture', () => {
     const t = testIo({ api, stdin: 'transcript text' });
     expect(await capture.run(['-'], t.io)).toBe(0);
     expect(t.stderr()).toContain('Already captured.');
+  });
+});
+
+describe('capture of a session over the cap', () => {
+  type Posted = { bytes: Buffer; ref: string | null; name: string; form: FormData };
+  /**
+   * POST sources as the server answers it, with a small cap: 413 source_too_large with maxBytes
+   * over `maxBytes`, 413 payload_too_large over `bodyLimit`, 400 for blank content, and a
+   * duplicate for content it stored before. `answer` can step in first, for a 429.
+   */
+  const server = (
+    maxBytes: number,
+    options: { bodyLimit?: number; answer?: (sent: Posted) => FakeReply | null } = {},
+  ) => {
+    const posted: Posted[] = [];
+    const stored = new Map<string, string>();
+    let running = 0;
+    let most = 0;
+    const route = async (call: FakeCall): Promise<FakeReply> => {
+      running += 1;
+      most = Math.max(most, running);
+      await new Promise((resolve) => setTimeout(resolve, 2));
+      running -= 1;
+      const form = call.form as FormData;
+      const file = form.get('content') as File;
+      const sent: Posted = {
+        bytes: Buffer.from(await file.arrayBuffer()),
+        ref: form.get('externalRef') as string | null,
+        name: file.name,
+        form,
+      };
+      posted.push(sent);
+      const early = options.answer?.(sent);
+      if (early) return early;
+      const size = sent.bytes.length;
+      if (options.bodyLimit !== undefined && size > options.bodyLimit) {
+        return { status: 413, body: { error: { code: 'payload_too_large', message: 'big' } } };
+      }
+      if (size > maxBytes) {
+        const error = { code: 'source_too_large', message: 'too large', sizeBytes: size, maxBytes };
+        return { status: 413, body: { error } };
+      }
+      const text = sent.bytes.toString('utf8');
+      if (text.trim() === '') {
+        return { status: 400, body: { error: { code: 'invalid_request', message: 'empty' } } };
+      }
+      const duplicate = stored.has(text);
+      if (!duplicate) stored.set(text, `s${stored.size + 1}`);
+      return { status: duplicate ? 200 : 201, body: { id: stored.get(text), duplicate } };
+    };
+    const { api } = fakeApi({ [`POST ${W}/sources`]: route });
+    return { api, posted, most: () => most };
+  };
+  /** JSON lines of about 40 bytes each, with a two-byte character in each. */
+  const lines = (from: number, to: number) =>
+    Array.from(
+      { length: to - from },
+      (_, i) => `{"type":"user","n":${from + i},"text":"café"}\n`,
+    ).join('');
+  const run = async (fake: ReturnType<typeof server>, path: string, ref = 'claude-code:abc') => {
+    const t = testIo({ api: fake.api });
+    const code = await capture.run([path, '--folder', 'sessions', '--ref', ref], t.io);
+    return { code, stdout: t.stdout(), stderr: t.stderr() };
+  };
+
+  it('posts the whole transcript once, then parts within maxBytes, cut at line ends, that join back to it', async () => {
+    // The last line has no line end: it ends a part all the same.
+    const body = `${lines(0, 20)}{"type":"assistant","n":20}`;
+    const fake = server(120);
+    const done = await run(fake, temp('session.jsonl', body));
+    expect(done.code).toBe(0);
+
+    const [whole, ...parts] = fake.posted;
+    expect(whole?.bytes.equals(Buffer.from(body))).toBe(true);
+    expect(whole?.ref).toBe('claude-code:abc');
+    expect(parts.length).toBeGreaterThan(3);
+    expect(Buffer.concat(parts.map((part) => part.bytes)).equals(Buffer.from(body))).toBe(true);
+    for (const [index, part] of parts.entries()) {
+      expect(part.bytes.length).toBeLessThanOrEqual(120);
+      if (index < parts.length - 1) expect(part.bytes.at(-1)).toBe(0x0a);
+      expect(part.ref).toBe(`claude-code:abc#part-${index + 1}`);
+      expect(part.name).toBe(`session.jsonl part ${index + 1} of ${parts.length}`);
+      expect(part.form.get('kind')).toBe('session');
+      expect(part.form.get('folder')).toBe('sessions');
+      expect(part.form.get('occurredAt')).toBe(whole?.form.get('occurredAt'));
+    }
+    expect(fake.most()).toBe(1); // one after another
+    expect(done.stdout).toBe(parts.map((_, i) => `s${i + 1}\n`).join(''));
+    expect(done.stderr).toBe(
+      `claude-code:abc: ${Buffer.byteLength(body)} bytes in ${parts.length} parts: ${parts.length} stored, 0 refused\n`,
+    );
+  });
+
+  it('sends a line longer than the cap alone, and logs its refusal with sizes and no content', async () => {
+    const long = `{"type":"tool_result","text":"${'zebra '.repeat(60)}"}\n`;
+    const fake = server(200);
+    const done = await run(
+      fake,
+      temp('long.jsonl', `${lines(0, 2)}${long}${lines(2, 4)}`),
+      'codex:xyz',
+    );
+    expect(done.code).toBe(1);
+    expect(fake.posted.slice(1).map((part) => part.bytes.toString('utf8'))).toEqual([
+      lines(0, 2),
+      long,
+      lines(2, 4),
+    ]);
+    const size = Buffer.byteLength(long);
+    expect(done.stderr).toBe(
+      `codex:xyz: part 2 of 3 refused (source_too_large), ${size} bytes, the largest source is 200 bytes\n` +
+        `codex:xyz: ${Buffer.byteLength(lines(0, 4)) + size} bytes in 3 parts: 2 stored, 1 refused\n`,
+    );
+    expect(done.stderr).not.toContain('zebra');
+    expect(done.stdout).toBe('s1\ns2\n');
+  });
+
+  it('sends the same refs when the same session is captured again, and its unchanged parts are the ones stored before', async () => {
+    const path = temp('again.jsonl', lines(0, 12));
+    const fake = server(200);
+    expect((await run(fake, path)).code).toBe(0);
+    const first = fake.posted.splice(0).slice(1);
+    const again = await run(fake, path);
+    expect(again.code).toBe(0);
+    const second = fake.posted.splice(0).slice(1);
+    expect(second.map((part) => part.ref)).toEqual(first.map((part) => part.ref));
+    expect(again.stdout).toBe(first.map((_, i) => `s${i + 1}\n`).join(''));
+    expect(again.stderr).toContain(
+      `${first.length} parts: ${first.length} stored (${first.length} captured before), 0 refused`,
+    );
+
+    // The session went on: the parts before its last are cut where they were, and are the same.
+    writeFileSync(path, lines(0, 16));
+    expect((await run(fake, path)).code).toBe(0);
+    const grown = fake.posted.splice(0).slice(1);
+    expect(first.length).toBeGreaterThan(2);
+    for (const [index, part] of first.slice(0, -1).entries()) {
+      expect(grown[index]?.ref).toBe(part.ref);
+      expect(grown[index]?.bytes.equals(part.bytes)).toBe(true);
+    }
+  });
+
+  it('waits for Retry-After once on a 429, then gives up on the rest with a log line', async () => {
+    let limited = 0;
+    const tooMany: FakeReply = {
+      status: 429,
+      body: { error: { code: 'too_many_requests', message: 'slow down' } },
+      headers: { 'Retry-After': '0' },
+    };
+    // The second part's first try is over the rate limit, its second is not, the third part's is.
+    const fake = server(200, {
+      answer: (sent) => (/#part-[23]$/.test(sent.ref ?? '') && limited++ !== 1 ? tooMany : null),
+    });
+    const body = lines(0, 20);
+    const done = await run(fake, temp('busy.jsonl', body));
+    expect(done.code).toBe(1);
+    expect(fake.posted.slice(1).map((part) => part.ref)).toEqual([
+      'claude-code:abc#part-1',
+      'claude-code:abc#part-2',
+      'claude-code:abc#part-2', // after the wait
+      'claude-code:abc#part-3', // a second 429: no more waiting
+    ]);
+    const total = Number(done.stderr.match(/in (\d+) parts/)?.[1]);
+    expect(total).toBeGreaterThan(3);
+    expect(done.stderr).toBe(
+      `claude-code:abc: rate limited at part 3 of ${total}, ${total - 2} parts not sent\n` +
+        `claude-code:abc: ${Buffer.byteLength(body)} bytes in ${total} parts: 2 stored, 0 refused, ${total - 2} not sent\n`,
+    );
+  });
+
+  it('asks for the cap with blank probes when the transcript is over the request body limit, and stores no probe', async () => {
+    const body = lines(0, 20);
+    const size = Buffer.byteLength(body);
+    // The whole and the first probe are over the body limit; the second probe is over the cap.
+    const fake = server(100, { bodyLimit: Math.floor(size / 2) - 1 });
+    expect((await run(fake, temp('huge.jsonl', body))).code).toBe(0);
+    const sent = fake.posted.slice(1);
+    const probes = sent.filter((one) => one.bytes.toString('utf8').trim() === '');
+    expect(probes.map((probe) => probe.bytes.length)).toEqual([
+      Math.floor(size / 2),
+      Math.floor(size / 4),
+    ]);
+    expect(probes.every((probe) => probe.ref === 'claude-code:abc')).toBe(true);
+    const parts = sent.slice(2);
+    expect(parts.every((part) => part.ref?.includes('#part-'))).toBe(true);
+    expect(Buffer.concat(parts.map((part) => part.bytes)).equals(Buffer.from(body))).toBe(true);
+    for (const part of parts) expect(part.bytes.length).toBeLessThanOrEqual(100);
+
+    // A probe refused as empty is under the cap: parts that long are stored.
+    const roomy = server(1000, { bodyLimit: Math.floor(size / 2) - 1 });
+    expect((await run(roomy, temp('roomy.jsonl', body))).code).toBe(0);
+    const [, first, second, ...rest] = roomy.posted;
+    expect([first?.bytes.length, second?.bytes.length]).toEqual([
+      Math.floor(size / 2),
+      Math.floor(size / 4),
+    ]);
+    expect(Buffer.concat(rest.map((part) => part.bytes)).equals(Buffer.from(body))).toBe(true);
+    for (const part of rest) expect(part.bytes.length).toBeLessThanOrEqual(Math.floor(size / 4));
   });
 });

@@ -1,0 +1,10 @@
+minimumReleaseAgeExclude:
+  - "@ai-sdk/*"
+  - ai
+  - eve
+  - "@eve/*"
+  - "@vercel/*"
+  - "@useonebrain/*"
+ignoredOptionalDependencies:
+  - "@mongodb-js/zstd"
+  - node-liblzma

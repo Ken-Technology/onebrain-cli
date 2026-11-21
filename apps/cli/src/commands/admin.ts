@@ -1,9 +1,11 @@
 import { CliError, type Command, type Io } from '../client.ts';
+import { run as access } from './admin/access.ts';
 import { run as agents } from './admin/agents.ts';
 import { run as folders } from './admin/folders.ts';
 import { run as grants } from './admin/grants.ts';
 import { run as groups } from './admin/groups.ts';
 import { run as keys } from './admin/keys.ts';
+import { run as loop } from './admin/loop.ts';
 import { run as members } from './admin/members.ts';
 import { run as workspace } from './admin/workspace.ts';
 
@@ -15,9 +17,11 @@ const areas: Record<string, (args: string[], io: Io) => Promise<number>> = {
   keys,
   folders,
   grants,
+  access,
+  loop,
 };
 
-const usage = `Manage a workspace: members, groups, agents, keys, folders and grants
+const usage = `Manage a workspace: members, groups, agents, keys, folders, grants, access and the learning loop
 
 Usage: onebrain admin <area> <action> [args]
 Agents and keys: you create your own agents and mint their keys; admins also manage the rest.

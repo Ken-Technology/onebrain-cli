@@ -3,6 +3,8 @@ import { ApiError, type Command, unwrap } from '../client.ts';
 
 const USAGE = 'Usage: onebrain read <path|id> [--version <n>] [--json]';
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+/** One line of plain text: no line breaks, and no control character a terminal would act on. */
+const oneLine = (text: string) => text.replace(/[\s\p{Cc}]+/gu, ' ').trim();
 
 export default {
   name: 'read',
@@ -36,6 +38,13 @@ export default {
       else {
         io.stdout(`${memory.text}\n`);
         io.stderr(`status: ${memory.status}\n`);
+        if (memory.kind) io.stderr(`kind: ${memory.kind}\n`);
+        // A memory a person or an agent saved has none. A server older than the loop sends neither field.
+        const evidence = memory.evidence ?? [];
+        if (evidence.length > 0) io.stderr('evidence:\n');
+        for (const item of evidence) {
+          io.stderr(`  ${item.sourceKind} ${item.at.slice(0, 10)}  "${oneLine(item.quote)}"\n`);
+        }
       }
       return 0;
     }

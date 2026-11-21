@@ -1,0 +1,64 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "onebrain",
+  "homepage": "https://useonebrain.com",
+  "items": [
+    {
+      "name": "memory",
+      "type": "registry:item",
+      "title": "One Brain memory",
+      "description": "Recall the team's One Brain files, skills and memories each turn, store each turn as a session, and give the model One Brain's six tools.",
+      "dependencies": ["@useonebrain/eve"],
+      "envVars": {
+        "ONEBRAIN_API_KEY": "",
+        "ONEBRAIN_URL": "https://api.useonebrain.com"
+      },
+      "meta": { "eve": { "requires": ">=1.0.0 <2.0.0" } },
+      "files": [
+        {
+          "path": "memory/onebrain.ts",
+          "type": "registry:file",
+          "target": "agent/memory/onebrain.ts"
+        }
+      ]
+    },
+    {
+      "name": "connection",
+      "type": "registry:item",
+      "title": "One Brain MCP",
+      "description": "One Brain's MCP server as an eve connection: search, read, list, remember, write and forget, with no recall or capture.",
+      "dependencies": ["@useonebrain/eve"],
+      "envVars": {
+        "ONEBRAIN_API_KEY": "",
+        "ONEBRAIN_URL": "https://api.useonebrain.com"
+      },
+      "meta": { "eve": { "requires": ">=1.0.0 <2.0.0" } },
+      "files": [
+        {
+          "path": "connections/onebrain.ts",
+          "type": "registry:file",
+          "target": "agent/connections/onebrain.ts"
+        }
+      ]
+    },
+    {
+      "name": "skills",
+      "type": "registry:item",
+      "title": "One Brain skills",
+      "description": "The skills in the team's One Brain as the agent's own skills, read once per session.",
+      "dependencies": ["@useonebrain/eve"],
+      "envVars": {
+        "ONEBRAIN_API_KEY": "",
+        "ONEBRAIN_URL": "https://api.useonebrain.com"
+      },
+      "meta": { "eve": { "requires": ">=1.0.0 <2.0.0" } },
+      "files": [
+        {
+          "path": "skills/onebrain.ts",
+          "type": "registry:file",
+          "target": "agent/skills/onebrain.ts"
+        }
+      ]
+    }
+  ]
+}

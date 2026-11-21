@@ -1,6 +1,6 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
-import type { components } from '@onebrain/sdk';
+import type { components } from '@useonebrain/sdk';
 import { type ClientName, clients } from '../agents/index.ts';
 import { type CliClient, CliError, type Io, unwrap } from '../client.ts';
 

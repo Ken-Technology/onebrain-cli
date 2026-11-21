@@ -1,0 +1,50 @@
+{
+  "name": "onebrain-agent-template",
+  "description": "A chat agent with your team's One Brain: its skills, knowledge and memories, and each chat sent back so One Brain learns from it.",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@cloudflare/think": "^0.24.0",
+    "@useonebrain/cloudflare": "^0.1.0",
+    "agents": "^0.34.0",
+    "ai": "^7.0.0",
+    "just-bash": "^3.6.1",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261120.1",
+    "typescript": "^5.9.3",
+    "wrangler": "^4.166.0"
+  },
+  "cloudflare": {
+    "label": "One Brain Agent",
+    "products": ["Agents", "Workers AI", "Durable Objects"],
+    "categories": ["ai"],
+    "bindings": {
+      "ONEBRAIN_API_KEY": {
+        "description": "A One Brain agent key (`ob_...`): make one in the One Brain app under **Agents**, or with `onebrain admin keys create <agent>`. The agent reads and writes what the key may."
+      },
+      "ONEBRAIN_URL": {
+        "description": "Your One Brain API. Keep `https://api.useonebrain.com` unless you run One Brain yourself."
+      },
+      "AGENT_TOKEN": {
+        "description": "Anyone with this token can chat with the agent, and through it reach your One Brain. Generate one with `openssl rand -hex 32`."
+      },
+      "ONEBRAIN_FOLDER": {
+        "description": "Optional. The One Brain folder for the agent's memories and captured chats, such as `agents/assistant`. A workspace agent key needs one, unless your workspace has a capture folder. Empty: a key that acts for a person keeps memories private to them."
+      },
+      "AI": {
+        "description": "Workers AI, for the default model."
+      },
+      "Assistant": {
+        "description": "The agent: one Durable Object per chat, holding its messages."
+      }
+    }
+  }
+}

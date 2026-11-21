@@ -1,0 +1,78 @@
+name: Release
+
+# Publishes the public packages (packages/sdk and packages/integrations/*) to
+# npm when a v* tag is pushed. Nothing else publishes them. GitHub-hosted like
+# CI, and the same pinned action SHAs.
+#
+# It stops before publishing unless the tag names a commit on main, the
+# NPM_TOKEN secret is set, typecheck and tests pass, and every public package
+# packs cleanly at the tag's version (v0.2.0 -> 0.2.0, one version for all).
+# pnpm -r publish skips a package whose version is already on npm, so running
+# it again for the same tag publishes only what is still missing.
+
+on:
+  push:
+    tags: ['v*']
+
+# One release at a time, and a publish is never cancelled halfway.
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  # For npm provenance: each package is signed with the job's GitHub OIDC token.
+  id-token: write
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          # Every branch, so the next step can see main.
+          fetch-depth: 0
+      # A tag on a commit that never merged would publish code no PR checked.
+      - name: The tag is on main
+        run: |
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
+            echo "::error::$GITHUB_REF_NAME ($GITHUB_SHA) is not on main. Tag a commit on main."
+            exit 1
+          fi
+      - name: NPM_TOKEN is set
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if [ -z "$NPM_TOKEN" ]; then
+            echo "::error::The NPM_TOKEN repository secret is not set."
+            exit 1
+          fi
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+      # No dependency cache: a release installs from the registry, not from a
+      # store another workflow run saved.
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          # Writes an .npmrc whose token is ${NODE_AUTH_TOKEN} and points
+          # NPM_CONFIG_USERCONFIG at it; pnpm reads that file for its auth.
+          registry-url: https://registry.npmjs.org
+      - name: Install
+        run: pnpm install --frozen-lockfile
+      - name: Typecheck
+        run: pnpm typecheck
+      - name: Test
+        run: pnpm test
+      # Packs each public package (prepack builds dist/), checks each tarball
+      # as CI does, and fails if a package's version is not the tag's.
+      - name: Packages pack at the tag's version
+        run: node scripts/check-packs.mjs --version "${GITHUB_REF_NAME#v}"
+      # --provenance on the command line: pnpm 11 does not read it from
+      # publishConfig, and ignores NPM_CONFIG_PROVENANCE.
+      # --no-git-checks: a tag checkout is a detached HEAD, not main.
+      - name: Publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: pnpm -r publish --access public --no-git-checks --provenance
